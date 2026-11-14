@@ -30,6 +30,7 @@ public class EmailService {
      * Sends an HTML verification email to the user.
      * In development/test or if SMTP is not configured, logs the verification link clearly so testing is frictionless.
      */
+    @SuppressWarnings("null")
     public boolean sendVerificationEmail(String recipientEmail, String recipientName, String plainToken) {
         String verificationUrl = baseUrl + "/verify-email?token=" + plainToken;
         String subject = "Verify Your Email Address – TechNova Tag Studio";

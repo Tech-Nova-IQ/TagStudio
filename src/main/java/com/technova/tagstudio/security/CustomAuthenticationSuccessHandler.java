@@ -1,7 +1,6 @@
 package com.technova.tagstudio.security;
 
 import com.technova.tagstudio.model.Role;
-import com.technova.tagstudio.model.User;
 import com.technova.tagstudio.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -40,9 +39,15 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         });
 
         // Determine redirect target based on authorities
-        boolean isAdmin = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .anyMatch(auth -> auth.equals(Role.ROLE_ADMIN.name()));
+        boolean isAdmin = false;
+        if (authentication.getAuthorities() != null) {
+            for (GrantedAuthority auth : authentication.getAuthorities()) {
+                if (Role.ROLE_ADMIN.name().equals(auth.getAuthority())) {
+                    isAdmin = true;
+                    break;
+                }
+            }
+        }
 
         if (isAdmin) {
             response.sendRedirect("/admin/dashboard");
@@ -51,3 +56,4 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         }
     }
 }
+

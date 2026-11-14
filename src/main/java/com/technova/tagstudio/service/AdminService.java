@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -165,7 +166,8 @@ public class AdminService {
     }
 
     private User getUserOrThrow(Long userId) {
-        return userRepository.findById(userId)
+        Long safeId = Objects.requireNonNull(userId, "User ID cannot be null");
+        return userRepository.findById(safeId)
                 .orElseThrow(() -> new IllegalArgumentException("User with ID " + userId + " does not exist."));
     }
 
