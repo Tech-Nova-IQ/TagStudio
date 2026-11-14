@@ -8,7 +8,91 @@
 
 ---
 
-## 1. System Access & Default Credentials
+## 1. Build, Run & Test Guide
+
+### 📋 Prerequisites
+- **Java Development Kit (JDK):** Java 21 LTS (`java -version` should report `21.x`)
+- **Build Tool:** Apache Maven 3.9+ (included via Maven Wrapper `./mvnw` / `.\mvnw.cmd`)
+- **Database:** Embedded H2 (automatically initialized at `./data/tagstudio.mv.db` on startup — no external database installation required)
+
+---
+
+### 🛠️ Building the Project
+
+#### Windows (PowerShell / CMD)
+```powershell
+.\mvnw.cmd clean compile
+```
+
+#### macOS / Linux (Bash)
+```bash
+./mvnw clean compile
+```
+
+To package a runnable JAR (skipping tests for a quick build):
+```powershell
+.\mvnw.cmd clean package -DskipTests
+```
+
+---
+
+### 🚀 Running the Application
+
+#### Option A: Using Spring Boot Maven Plugin (Recommended for Development)
+
+**Windows (PowerShell):**
+```powershell
+.\mvnw.cmd spring-boot:run
+```
+
+**macOS / Linux (Bash):**
+```bash
+./mvnw spring-boot:run
+```
+
+#### Option B: Running the Packaged JAR
+```powershell
+java -jar target\technova-tag-studio-1.0.0-SNAPSHOT.jar
+```
+
+Once started, the application is accessible at:
+- **Application Console:** `http://localhost:8081`
+- **Login Page:** `http://localhost:8081/login`
+- **Admin Dashboard:** `http://localhost:8081/admin/dashboard`
+
+---
+
+### 🧪 Running Automated Tests
+
+To execute the full integration and unit test suite (`AuthAndAdminIntegrationTest`, `ChatServiceTest`):
+
+**Windows (PowerShell):**
+```powershell
+.\mvnw.cmd test
+```
+
+**macOS / Linux (Bash):**
+```bash
+./mvnw test
+```
+
+---
+
+### ⚙️ Optional Environment Variables
+
+| Environment Variable | Default Value | Purpose |
+|----------------------|---------------|---------|
+| `PORT` | `8081` | HTTP server port |
+| `GEMINI_API_KEY` | *(empty)* | Google Gemini API key for Studio AI features |
+| `ADMIN_EMAIL` | `admin@technovaiq.com` | Default bootstrap administrator email |
+| `ADMIN_PASSWORD` | `Admin@TechNova2026!` | Default bootstrap administrator password |
+| `ADMIN_NAME` | `TechNova Administrator` | Default bootstrap administrator display name |
+| `BOOTSTRAP_ADMIN_ENABLED` | `true` | Enable/disable automatic admin seeding on startup |
+| `APP_BASE_URL` | `http://localhost:8081` | Base URL used in email verification links |
+
+---
+
+## 2. System Access & Default Credentials
 
 When the application boots up, the idempotent `DataInitializer` checks if an administrator exists. If none is found, it securely creates the default administrator account.
 
@@ -44,7 +128,7 @@ When the application boots up, the idempotent `DataInitializer` checks if an adm
 
 ---
 
-## 2. Key URLs & Endpoints
+## 3. Key URLs & Endpoints
 
 | Endpoint | Access Level | Description |
 |----------|--------------|-------------|
@@ -61,7 +145,7 @@ When the application boots up, the idempotent `DataInitializer` checks if an adm
 
 ---
 
-## 3. Executive Summary of Work Completed (Phases 1 – 5)
+## 4. Executive Summary of Work Completed (Phases 1 – 5)
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
@@ -140,7 +224,7 @@ When the application boots up, the idempotent `DataInitializer` checks if an adm
 
 ---
 
-## 4. Git & CodeRabbit Integration
+## 5. Git & CodeRabbit Integration
 
 - **Remote Repository:** `https://github.com/Tech-Nova-IQ/TagStudio.git` (`main` branch)
 - **Local Working Copy:** `G:\technova-tag-studio`
