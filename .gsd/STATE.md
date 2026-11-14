@@ -65,6 +65,7 @@ Phase 3 (**YouTube Description Formatting & Shorts Compatibility**) has been ful
 
 | Decision | Choice | Made | Affects |
 |----------|--------|------|---------|
+| CodeRabbit & GSD Integration | Configure root `.coderabbit.yaml` enforcing GSD protocol, frozen `TagGeneratorService.java`, BCrypt & role-based security, and Shorts formatting | Current | PR reviews & VS Code |
 | Role-Based Access Control | Enforce `ROLE_ADMIN` and `ROLE_USER` via Spring Security 6 `SecurityFilterChain` | Phase 5 | Entire application |
 | Verification Token Security | Store only SHA-256 hashes of single-use verification tokens in database | Phase 5 | `AuthService`, DB |
 | Last Active Admin Guard | Prevent deleting, demoting, locking, or disabling the final active administrator | Phase 5 | `AdminService` |
