@@ -10,6 +10,7 @@ import com.technova.tagstudio.service.TagGeneratorService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,9 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@TestPropertySource(properties = {
+    "spring.datasource.url=jdbc:h2:mem:chattestdb;DB_CLOSE_DELAY=-1"
+})
 public class ChatServiceTest {
 
     @Autowired
@@ -397,5 +401,48 @@ public class ChatServiceTest {
         assertTrue(formattedForShorts.contains("\u200B"), "Must contain \\u200B on blank lines for YouTube Shorts compatibility");
         assertFalse(formattedForShorts.contains("**What you'll learn:**"), "Markdown bolding must be stripped in clipboard output");
         assertTrue(formattedForShorts.contains("What you'll learn:"));
+    }
+
+    @Test
+    public void testOptimizeDescriptionBranchPoliciesAndQuestionTopics() {
+        String rawBranchPolicyDescription =
+            "Learn how What Branch Policies Enforces works with practical, real-world walkthroughs from TechNova IQ to improve your development workflow and technical skills.\n\n" +
+            "In this walkthrough, you'll explore what branch policies enforces configuration, what branch policies enforces architecture deep dive, what branch policies enforces performance tuning, what branch policies enforces for absolute beginners, what branch policies enforces step by step guide, helping you master essential techniques and practical concepts.\n\n" +
+            "Perfect for What Branch Policies Enforces beginners, developers, DevOps engineers, DBAs, QA engineers, cloud professionals, and interview preparation.\n\n" +
+            "TechNova IQ — Learn Smarter. Code Faster.\n\n" +
+            "#AzureDevOps #AzureReposBranchPolicies #BuildValidationPolicy #MinimumReviewersGit\n\n" +
+            "What what branch policies enforces strategy or technique do you use most — or what's your biggest challenge with it? Share below! 👇\n\n" +
+            "If this helped you understand What Branch Policies Enforces, like 👍 and subscribe to TechNova IQ for more practical tutorials and technical concepts.";
+
+        String optimized = chatService.optimizeDescription(rawBranchPolicyDescription, "What Branch Policies Enforces", "TechNova IQ");
+
+        assertNotNull(optimized);
+
+        // 1. Clean core subject ("Branch Policies") extracted without awkward "What Branch Policies Enforces" or "What what"
+        assertTrue(optimized.contains("Learn how Branch Policies work"), "Hook must use clean core subject and plural verb");
+        assertFalse(optimized.contains("Learn how What Branch Policies Enforces works"), "Must not contain awkward question-in-hook phrasing");
+        assertFalse(optimized.toLowerCase().contains("what what"), "Must never produce duplicate 'What what'");
+
+        // 2. Domain-specific explanation and takeaway (Branch Policies, not Pipeline Caching)
+        assertTrue(optimized.contains("enforcing mandatory code reviews, automating build validation, and protecting production branches"), "Explanation must match Branch Policies topic");
+        assertFalse(optimized.contains("identifying pipeline bottlenecks"), "Must not leak pipeline bottleneck text into Branch Policies");
+        assertTrue(optimized.contains("Enforcing branch policies on main and release branches"), "Key takeaway must match Branch Policies topic");
+        assertFalse(optimized.contains("eliminate redundant downloads through caching"), "Must not leak pipeline caching takeaway into Branch Policies");
+
+        // 3. No repetitive "best practices and techniques." spam in bullets
+        assertFalse(optimized.contains("best practices and techniques."), "Must not spam 'best practices and techniques.' on every bullet");
+        assertFalse(optimized.contains("For absolute beginners best practices"), "Must not produce broken bullet fragments");
+        assertTrue(optimized.contains("- Configure minimum reviewer rules and approval policies for pull requests."));
+        assertTrue(optimized.contains("- Enforce automated build validation policies to prevent broken merges."));
+
+        // 4. Clean Target Audience without unrelated DBAs or trailing 'and interview preparation'
+        assertFalse(optimized.contains("DBAs"), "Branch Policies audience should not include DBAs");
+        assertFalse(optimized.contains("and interview preparation."), "Must not end with noun-mismatch 'and interview preparation.'");
+        assertTrue(optimized.contains("engineers preparing for technical interviews."));
+
+        // 5. Relevant bottom hashtags
+        assertTrue(optimized.contains("#BranchPolicies"));
+        assertTrue(optimized.contains("#AzureRepos"));
+        assertTrue(optimized.contains("#BuildValidation"));
     }
 }

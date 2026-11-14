@@ -307,6 +307,21 @@ public class ChatService {
      * Eliminates keyword dumps, removes redundant keyword prefixes, filters out unrelated categories
      * and ungrounded claims (e.g. "2026", "full course free"), and curates hashtags into concise, recognizable tags.
      */
+    public String extractCoreSubject(String rawTopic) {
+        if (rawTopic == null || rawTopic.isBlank()) {
+            return "Azure DevOps Pipeline Optimization";
+        }
+        String cleaned = cleanTopicString(rawTopic);
+        boolean startsWithQuestion = cleaned.matches("(?i)^(?:what|how|why|when|where|which)\\b.*");
+        String core = cleaned
+                .replaceAll("(?i)^(?:what(?:\\s+(?:is|are|does|do))?|how(?:\\s+(?:to|does|do))?|why(?:\\s+(?:is|are|does|do))?|when(?:\\s+to)?|where(?:\\s+to)?|which)\\s+", "")
+                .trim();
+        if (startsWithQuestion) {
+            core = core.replaceAll("(?i)\\s+(?:enforces|enforce|works|work|does|do|is|are|matters|matter|means|mean)$", "").trim();
+        }
+        return core.isEmpty() ? cleaned : capitalizeWords(core);
+    }
+
     public String optimizeDescription(String rawDescription, String topic, String channel) {
         if (rawDescription == null || rawDescription.trim().isEmpty()) {
             return "";
@@ -314,121 +329,121 @@ public class ChatService {
 
         String ch = (channel != null && !channel.isBlank()) ? channel.trim() : "TechNova IQ";
         String primaryTopic = (topic != null && !topic.isBlank()) ? cleanTopicString(topic) : "Azure DevOps Pipeline Optimization";
+        String coreSubject = extractCoreSubject(primaryTopic);
+        String lowerTopic = primaryTopic.toLowerCase();
 
-        // Extract key components from raw template if present
-        String[] paras = rawDescription.split("\n\n+");
+        boolean isBranchPolicyTopic = lowerTopic.contains("branch polic")
+                || lowerTopic.contains("pull request")
+                || lowerTopic.contains("reviewer")
+                || lowerTopic.contains("azure repos")
+                || lowerTopic.contains("build validation");
 
-        String hook = "";
-        String keywordsRaw = "";
-        String audienceRaw = "";
-        String question = "";
-        String closingCta = "";
+        boolean isPipelineTopic = lowerTopic.contains("pipeline")
+                || lowerTopic.contains("ci/cd")
+                || lowerTopic.contains("cicd")
+                || lowerTopic.contains("slow build")
+                || lowerTopic.contains("yaml");
 
-        for (String p : paras) {
-            String trimmed = p.trim();
-            if (trimmed.startsWith("Learn how") || trimmed.startsWith("Is your") || trimmed.startsWith("Discover how")
-                    || (hook.isEmpty() && !trimmed.contains("walkthrough, you'll explore") && !trimmed.contains("Perfect for") && !trimmed.startsWith("#") && !trimmed.contains("— Learn Smarter"))) {
-                hook = trimmed;
-            } else if (trimmed.contains("walkthrough, you'll explore") || trimmed.contains("explore ") || trimmed.contains("master essential techniques")) {
-                keywordsRaw = trimmed;
-            } else if (trimmed.startsWith("Perfect for") || trimmed.toLowerCase().contains("beginners, developers")) {
-                audienceRaw = trimmed;
-            } else if (trimmed.startsWith("What ") || trimmed.contains("Share below") || trimmed.contains("Which stage takes the longest")) {
-                question = trimmed;
-            } else if (trimmed.startsWith("If this helped") || trimmed.startsWith("Like this video") || trimmed.contains("subscribe to")) {
-                closingCta = trimmed;
-            }
-        }
+        boolean isDatabaseTopic = lowerTopic.contains("database")
+                || lowerTopic.contains("sql")
+                || lowerTopic.contains("dba")
+                || lowerTopic.contains("normalization");
 
-        if (hook.isEmpty()) {
-            hook = "Master " + primaryTopic + " with practical, real-world walkthroughs from " + ch + " to accelerate your build performance and engineering workflow! 🚀";
-        }
-
-        // Section 2: Topic Explanation
-        String explanation = "In this video, learn practical approaches to " + primaryTopic + ", focusing on identifying pipeline bottlenecks, optimizing dependencies, and streamlining execution for reliable continuous integration.";
-
-        // Section 3: What You'll Learn (curate from keywordsRaw without repetitive prefixes or ungrounded claims)
-        List<String> bullets = new ArrayList<>();
-        if (!keywordsRaw.isEmpty()) {
-            // Strip wrapper prefix and suffix
-            String itemsOnly = keywordsRaw.replaceAll("(?i)^.*?explore\\s+", "")
-                                          .replaceAll("(?i),\\s*helping you master.*$", "");
-            String[] rawItems = itemsOnly.split(",\\s*");
-            Set<String> seen = new LinkedHashSet<>();
-            for (String item : rawItems) {
-                String cleanItem = item.trim().replaceAll("(?i)^" + Pattern.quote(primaryTopic) + "\\s*", "").trim();
-                // Filter out ungrounded claims and unrelated category leakage
-                if (cleanItem.isEmpty() || cleanItem.matches("(?i).*(?:2026|full course free|basics|tutorial|explained).*")
-                        || cleanItem.equalsIgnoreCase("database design")
-                        || cleanItem.equalsIgnoreCase("database normalization")
-                        || cleanItem.equalsIgnoreCase("clean code")
-                        || cleanItem.equalsIgnoreCase("coding best practices")
-                        || cleanItem.equalsIgnoreCase("YouTube Shorts")
-                        || cleanItem.equalsIgnoreCase("Shorts tutorial")) {
-                    continue;
-                }
-                String bulletText = capitalizeWords(cleanItem);
-                if (seen.add(bulletText.toLowerCase())) {
-                    bullets.add("- " + bulletText + " best practices and techniques.");
-                    if (bullets.size() >= 5) break;
-                }
-            }
-        }
-        if (bullets.isEmpty()) {
-            bullets.add("- Identify and resolve pipeline bottlenecks efficiently.");
-            bullets.add("- Configure dependency caching to eliminate repeated downloads.");
-            bullets.add("- Parallelize independent jobs across available agent capacity.");
-            bullets.add("- Measure performance benchmarks before and after optimization.");
-        }
-
-        // Section 4: Key Takeaway
-        String keyTakeaway = "**Key takeaway:** Measure pipeline performance first, eliminate redundant downloads through caching, and execute independent jobs in parallel for maximum build efficiency.";
-
-        // Section 5: Target Audience
-        String targetAudience;
-        if (!audienceRaw.isBlank()) {
-            String cleanAudience = audienceRaw
-                    .replaceAll("(?i)^(Perfect for|Whether you are a|Whether you're a)\\s*", "")
-                    .replaceAll("(?i)(,\\s*this breakdown is designed for you\\.?|,\\s*this guide is for you\\.?|\\.?)$", "")
-                    .trim();
-            if (cleanAudience.toLowerCase().startsWith(primaryTopic.toLowerCase())) {
-                cleanAudience = cleanAudience.substring(primaryTopic.length()).trim();
-                cleanAudience = cleanAudience.replaceAll("^[\\s,]+", "");
-            }
-            if (cleanAudience.isEmpty()) {
-                targetAudience = "**Target audience:** Developers, DevOps engineers, cloud architects, and technical interview candidates.";
-            } else {
-                cleanAudience = Character.toUpperCase(cleanAudience.charAt(0)) + cleanAudience.substring(1);
-                targetAudience = "**Target audience:** " + cleanAudience + (cleanAudience.endsWith(".") ? "" : ".");
-            }
+        // Section 1: Opening Hook (grammatically natural for both noun and question topics)
+        String hook;
+        if (primaryTopic.matches("(?i)^(?:what|how|why|when|where|which)\\b.*")) {
+            String verb = coreSubject.toLowerCase().endsWith("s") ? "work" : "works";
+            hook = "Learn how " + coreSubject + " " + verb + " with practical, real-world walkthroughs from " + ch + " to improve your development workflow and technical skills.";
         } else {
-            targetAudience = "**Target audience:** Developers, DevOps engineers, cloud architects, and technical interview candidates.";
+            hook = "Learn how " + primaryTopic + " works with practical, real-world walkthroughs from " + ch + " to improve your development workflow and technical skills.";
         }
 
-        // Section 6: Engagement CTA
-        if (question.isEmpty()) {
-            question = "💬 Which pipeline stage takes the longest in your workflow: Restore, Build, or Test? Share your experience in the comments below!";
-        } else if (!question.startsWith("💬")) {
-            question = "💬 " + question;
+        // Section 2: Topic Explanation (dynamically adapted to topic domain)
+        String explanation;
+        if (isBranchPolicyTopic) {
+            explanation = "In this video, learn practical approaches to " + coreSubject + ", focusing on enforcing mandatory code reviews, automating build validation, and protecting production branches in Git and Azure Repos.";
+        } else if (isPipelineTopic) {
+            explanation = "In this video, learn practical approaches to " + coreSubject + ", focusing on identifying pipeline bottlenecks, optimizing dependencies, and streamlining execution for reliable continuous integration.";
+        } else {
+            explanation = "In this video, learn practical approaches to " + coreSubject + ", focusing on core architecture, real-world configuration patterns, and proven techniques for reliable production workflows.";
         }
 
-        // Section 7: Like & Subscribe CTA
-        if (closingCta.isEmpty()) {
-            closingCta = "👍 Like this video and subscribe to **" + ch + "** for practical DevOps tutorials, cloud engineering, and technical interview preparation.";
-        } else if (!closingCta.startsWith("👍")) {
-            closingCta = "👍 " + closingCta;
+        // Section 3: What You'll Learn (distinct, natural sentences without repetitive suffix spam)
+        List<String> bullets = new ArrayList<>();
+        if (isBranchPolicyTopic) {
+            bullets.add("- Configure minimum reviewer rules and approval policies for pull requests.");
+            bullets.add("- Enforce automated build validation policies to prevent broken merges.");
+            bullets.add("- Require linked work items and comment resolution before completing merges.");
+            bullets.add("- Protect main and release branches from direct, unreviewed code pushes.");
+            bullets.add("- Apply path filters and automatic code reviewer assignments in Azure Repos.");
+        } else if (isPipelineTopic) {
+            bullets.add("- Configuration strategies for scalable, maintainable YAML pipelines.");
+            bullets.add("- Architecture deep dive into build agents, stages, and job dependencies.");
+            bullets.add("- Performance tuning using dependency caching and parallel job execution.");
+            bullets.add("- Step-by-step bottleneck diagnosis across checkout, restore, build, and test.");
+        } else {
+            bullets.add("- Core concepts, architecture, and how " + coreSubject + " works under the hood.");
+            bullets.add("- Step-by-step configuration and real-world implementation workflows.");
+            bullets.add("- Performance tuning, validation checks, and operational best practices.");
+            bullets.add("- Common pitfalls to avoid and troubleshooting strategies in production.");
         }
+
+        // Section 4: Key Takeaway (domain-aware)
+        String keyTakeaway;
+        if (isBranchPolicyTopic) {
+            keyTakeaway = "**Key takeaway:** Enforcing branch policies on main and release branches prevents unreviewed code and broken builds from reaching production while maintaining high engineering standards.";
+        } else if (isPipelineTopic) {
+            keyTakeaway = "**Key takeaway:** Measure pipeline performance first, eliminate redundant downloads through caching, and execute independent jobs in parallel for maximum build efficiency.";
+        } else {
+            keyTakeaway = "**Key takeaway:** Applying structured configuration, automated validation, and proven architectural patterns with " + coreSubject + " ensures reliable, maintainable results in real-world projects.";
+        }
+
+        // Section 5: Target Audience (clean role list without unrelated DBAs or trailing 'interview preparation' noun error)
+        String targetAudience;
+        if (isDatabaseTopic) {
+            targetAudience = "**Target audience:** Software developers, database administrators (DBAs), data engineers, and engineers preparing for technical interviews.";
+        } else {
+            targetAudience = "**Target audience:** Software developers, DevOps engineers, QA and cloud professionals, and engineers preparing for technical interviews.";
+        }
+
+        // Section 6: Engagement CTA (uses coreSubject so it never produces 'What what...')
+        String question;
+        if (isBranchPolicyTopic) {
+            question = "💬 Which branch policy rule do you rely on most in your workflow: Minimum Reviewers, Build Validation, or Work Item Linking? Share below! 👇";
+        } else {
+            question = "💬 What " + coreSubject + " strategy or technique do you use most — or what's your biggest challenge with it? Share below! 👇";
+        }
+
+        // Section 7: Like & Subscribe CTA (single 👍 emoji, natural phrasing)
+        String closingCta = "👍 If this helped you understand " + coreSubject + ", hit Like and subscribe to **" + ch + "** for more practical tutorials and technical concepts.";
 
         // Section 8: Brand Closing
         String brandClosing = ch + " — Learn Smarter. Code Faster.";
 
-        // Section 9: Concise Hashtags (5-10 concise tags)
+        // Section 9: Concise Hashtags (5-8 topic-relevant tags placed strictly at the bottom)
         Set<String> hashtags = new LinkedHashSet<>();
-        hashtags.add("#" + primaryTopic.replaceAll("[^a-zA-Z0-9]", ""));
-        hashtags.add("#CICD");
-        hashtags.add("#DevOps");
-        hashtags.add("#PipelineOptimization");
-        hashtags.add("#CloudEngineering");
+        String cleanCoreHash = "#" + coreSubject.replaceAll("[^a-zA-Z0-9]", "");
+        if (cleanCoreHash.length() > 1) {
+            hashtags.add(cleanCoreHash);
+        }
+        if (isBranchPolicyTopic) {
+            hashtags.add("#AzureDevOps");
+            hashtags.add("#AzureRepos");
+            hashtags.add("#BranchPolicies");
+            hashtags.add("#PullRequests");
+            hashtags.add("#BuildValidation");
+            hashtags.add("#GitWorkflow");
+        } else if (isPipelineTopic) {
+            hashtags.add("#AzureDevOps");
+            hashtags.add("#CICD");
+            hashtags.add("#DevOps");
+            hashtags.add("#PipelineOptimization");
+            hashtags.add("#CloudEngineering");
+        } else {
+            hashtags.add("#DevOps");
+            hashtags.add("#CloudEngineering");
+            hashtags.add("#SoftwareEngineering");
+        }
         hashtags.add("#" + ch.replaceAll("[^a-zA-Z0-9]", ""));
         hashtags.add("#Shorts");
         String hashtagLine = String.join(" ", hashtags);

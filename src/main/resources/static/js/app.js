@@ -270,108 +270,144 @@ function formatYouTubeDescription(rawText) {
   return result.join('\n').trim();
 }
 
+function extractCoreSubject(rawTopic) {
+  if (!rawTopic || !rawTopic.trim()) return 'Azure DevOps Pipeline Optimization';
+  const cleaned = cleanTopicString(rawTopic);
+  const startsWithQuestion = /^(?:what|how|why|when|where|which)\b/i.test(cleaned);
+  let core = cleaned
+    .replace(/^(?:what(?:\s+(?:is|are|does|do))?|how(?:\s+(?:to|does|do))?|why(?:\s+(?:is|are|does|do))?|when(?:\s+to)?|where(?:\s+to)?|which)\s+/i, '')
+    .trim();
+  if (startsWithQuestion) {
+    core = core.replace(/\s+(?:enforces|enforce|works|work|does|do|is|are|matters|matter|means|mean)$/i, '').trim();
+  }
+  if (!core) return cleaned;
+  return core.split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+}
+
 function optimizeDescriptionTemplate(rawTemplate, topic, channel) {
   if (!rawTemplate) return '';
   const ch = channel || currentChannelName() || 'TechNova IQ';
   const primaryTopic = topic ? cleanTopicString(topic) : (currentTopic() ? cleanTopicString(currentTopic()) : 'Azure DevOps Pipeline Optimization');
+  const coreSubject = extractCoreSubject(primaryTopic);
+  const lowerTopic = primaryTopic.toLowerCase();
 
   // If already structured with "What you'll learn", return as-is
   if (rawTemplate.includes("What you'll learn") && rawTemplate.includes("Key takeaway")) {
     return rawTemplate;
   }
 
-  // Parse sections by double newlines
-  const paras = rawTemplate.split(/\n\n+/);
-  let hook = '';
-  let keywordsRaw = '';
-  let audienceRaw = '';
-  let question = '';
-  let closingCta = '';
+  const isBranchPolicyTopic = lowerTopic.includes('branch polic')
+    || lowerTopic.includes('pull request')
+    || lowerTopic.includes('reviewer')
+    || lowerTopic.includes('azure repos')
+    || lowerTopic.includes('build validation');
 
-  for (const p of paras) {
-    const trimmed = p.trim();
-    if (trimmed.startsWith('Learn how') || trimmed.startsWith('Is your') || trimmed.startsWith('Discover how') || (!hook && !trimmed.includes("walkthrough, you'll explore") && !trimmed.includes('Perfect for') && !trimmed.startsWith('#') && !trimmed.includes('— Learn Smarter'))) {
-      hook = trimmed;
-    } else if (trimmed.includes("walkthrough, you'll explore") || trimmed.includes('explore ') || trimmed.includes('master essential techniques')) {
-      keywordsRaw = trimmed;
-    } else if (trimmed.startsWith('Perfect for') || trimmed.toLowerCase().includes('beginners, developers')) {
-      audienceRaw = trimmed;
-    } else if (trimmed.startsWith('What ') || trimmed.includes('Share below') || trimmed.includes('Which stage takes the longest')) {
-      question = trimmed;
-    } else if (trimmed.startsWith('If this helped') || trimmed.startsWith('Like this video') || trimmed.includes('subscribe to')) {
-      closingCta = trimmed;
-    }
+  const isPipelineTopic = lowerTopic.includes('pipeline')
+    || lowerTopic.includes('ci/cd')
+    || lowerTopic.includes('cicd')
+    || lowerTopic.includes('slow build')
+    || lowerTopic.includes('yaml');
+
+  const isDatabaseTopic = lowerTopic.includes('database')
+    || lowerTopic.includes('sql')
+    || lowerTopic.includes('dba')
+    || lowerTopic.includes('normalization');
+
+  // Section 1: Opening Hook (grammatically natural for both noun and question topics)
+  let hook;
+  if (/^(?:what|how|why|when|where|which)\b/i.test(primaryTopic)) {
+    const verb = coreSubject.toLowerCase().endsWith('s') ? 'work' : 'works';
+    hook = `Learn how ${coreSubject} ${verb} with practical, real-world walkthroughs from ${ch} to improve your development workflow and technical skills.`;
+  } else {
+    hook = `Learn how ${primaryTopic} works with practical, real-world walkthroughs from ${ch} to improve your development workflow and technical skills.`;
   }
 
-  if (!hook) {
-    hook = `Master ${primaryTopic} with practical, real-world walkthroughs from ${ch} to accelerate your build performance and engineering workflow! 🚀`;
+  // Section 2: Topic Explanation (dynamically adapted to topic domain)
+  let explanation;
+  if (isBranchPolicyTopic) {
+    explanation = `In this video, learn practical approaches to ${coreSubject}, focusing on enforcing mandatory code reviews, automating build validation, and protecting production branches in Git and Azure Repos.`;
+  } else if (isPipelineTopic) {
+    explanation = `In this video, learn practical approaches to ${coreSubject}, focusing on identifying pipeline bottlenecks, optimizing dependencies, and streamlining execution for reliable continuous integration.`;
+  } else {
+    explanation = `In this video, learn practical approaches to ${coreSubject}, focusing on core architecture, real-world configuration patterns, and proven techniques for reliable production workflows.`;
   }
 
-  const explanation = `In this video, learn practical approaches to ${primaryTopic}, focusing on identifying pipeline bottlenecks, optimizing dependencies, and streamlining execution for reliable continuous integration.`;
-
+  // Section 3: What You'll Learn (distinct, natural sentences without repetitive suffix spam)
   const bullets = [];
-  if (keywordsRaw) {
-    const itemsOnly = keywordsRaw.replace(/^.*?explore\s+/i, '').replace(/,\s*helping you master.*$/i, '');
-    const rawItems = itemsOnly.split(/,\s*/);
-    const seen = new Set();
-    const topicRegex = new RegExp('^' + primaryTopic.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*', 'i');
-    for (const item of rawItems) {
-      let cleanItem = item.trim().replace(topicRegex, '').trim();
-      if (!cleanItem || /(?:2026|full course free|basics|tutorial|explained)/i.test(cleanItem)
-          || /^(?:database design|database normalization|clean code|coding best practices|YouTube Shorts|Shorts tutorial)$/i.test(cleanItem)) {
-        continue;
-      }
-      cleanItem = cleanItem.charAt(0).toUpperCase() + cleanItem.slice(1);
-      if (!seen.has(cleanItem.toLowerCase())) {
-        seen.add(cleanItem.toLowerCase());
-        bullets.push(`- ${cleanItem} best practices and techniques.`);
-        if (bullets.length >= 5) break;
-      }
-    }
-  }
-  if (bullets.length === 0) {
-    bullets.push('- Identify and resolve pipeline bottlenecks efficiently.');
-    bullets.push('- Configure dependency caching to eliminate repeated downloads.');
-    bullets.push('- Parallelize independent jobs across available agent capacity.');
-    bullets.push('- Measure performance benchmarks before and after optimization.');
+  if (isBranchPolicyTopic) {
+    bullets.push('- Configure minimum reviewer rules and approval policies for pull requests.');
+    bullets.push('- Enforce automated build validation policies to prevent broken merges.');
+    bullets.push('- Require linked work items and comment resolution before completing merges.');
+    bullets.push('- Protect main and release branches from direct, unreviewed code pushes.');
+    bullets.push('- Apply path filters and automatic code reviewer assignments in Azure Repos.');
+  } else if (isPipelineTopic) {
+    bullets.push('- Configuration strategies for scalable, maintainable YAML pipelines.');
+    bullets.push('- Architecture deep dive into build agents, stages, and job dependencies.');
+    bullets.push('- Performance tuning using dependency caching and parallel job execution.');
+    bullets.push('- Step-by-step bottleneck diagnosis across checkout, restore, build, and test.');
+  } else {
+    bullets.push(`- Core concepts, architecture, and how ${coreSubject} works under the hood.`);
+    bullets.push('- Step-by-step configuration and real-world implementation workflows.');
+    bullets.push('- Performance tuning, validation checks, and operational best practices.');
+    bullets.push('- Common pitfalls to avoid and troubleshooting strategies in production.');
   }
 
-  const keyTakeaway = `**Key takeaway:** Measure pipeline performance first, eliminate redundant downloads through caching, and execute independent jobs in parallel for maximum build efficiency.`;
-
-  let targetAudience = '**Target audience:** Developers, DevOps engineers, cloud architects, and technical interview candidates.';
-  if (audienceRaw) {
-    let cleanAudience = audienceRaw
-      .replace(/^(?:Perfect for|Whether you are a|Whether you're a)\s*/i, '')
-      .replace(/(?:,\s*this breakdown is designed for you\.?|,\s*this guide is for you\.?|\.?)$/i, '')
-      .trim();
-    const topicRegex = new RegExp('^' + primaryTopic.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*', 'i');
-    cleanAudience = cleanAudience.replace(topicRegex, '').replace(/^[\s,]+/, '').trim();
-    if (cleanAudience) {
-      cleanAudience = cleanAudience.charAt(0).toUpperCase() + cleanAudience.slice(1);
-      targetAudience = `**Target audience:** ${cleanAudience}${cleanAudience.endsWith('.') ? '' : '.'}`;
-    }
+  // Section 4: Key Takeaway (domain-aware)
+  let keyTakeaway;
+  if (isBranchPolicyTopic) {
+    keyTakeaway = `**Key takeaway:** Enforcing branch policies on main and release branches prevents unreviewed code and broken builds from reaching production while maintaining high engineering standards.`;
+  } else if (isPipelineTopic) {
+    keyTakeaway = `**Key takeaway:** Measure pipeline performance first, eliminate redundant downloads through caching, and execute independent jobs in parallel for maximum build efficiency.`;
+  } else {
+    keyTakeaway = `**Key takeaway:** Applying structured configuration, automated validation, and proven architectural patterns with ${coreSubject} ensures reliable, maintainable results in real-world projects.`;
   }
 
-  if (!question) {
-    question = `💬 Which pipeline stage takes the longest in your workflow: Restore, Build, or Test? Share your experience in the comments below!`;
-  } else if (!question.startsWith('💬')) {
-    question = `💬 ${question}`;
+  // Section 5: Target Audience (clean role list without unrelated DBAs or trailing 'interview preparation' noun error)
+  let targetAudience;
+  if (isDatabaseTopic) {
+    targetAudience = '**Target audience:** Software developers, database administrators (DBAs), data engineers, and engineers preparing for technical interviews.';
+  } else {
+    targetAudience = '**Target audience:** Software developers, DevOps engineers, QA and cloud professionals, and engineers preparing for technical interviews.';
   }
 
-  if (!closingCta) {
-    closingCta = `👍 Like this video and subscribe to **${ch}** for practical DevOps tutorials, cloud engineering, and technical interview preparation.`;
-  } else if (!closingCta.startsWith('👍')) {
-    closingCta = `👍 ${closingCta}`;
+  // Section 6: Engagement CTA (uses coreSubject so it never produces 'What what...')
+  let question;
+  if (isBranchPolicyTopic) {
+    question = `💬 Which branch policy rule do you rely on most in your workflow: Minimum Reviewers, Build Validation, or Work Item Linking? Share below! 👇`;
+  } else {
+    question = `💬 What ${coreSubject} strategy or technique do you use most — or what's your biggest challenge with it? Share below! 👇`;
   }
 
+  // Section 7: Like & Subscribe CTA (single 👍 emoji, natural phrasing)
+  const closingCta = `👍 If this helped you understand ${coreSubject}, hit Like and subscribe to **${ch}** for more practical tutorials and technical concepts.`;
+
+  // Section 8: Brand Closing
   const brandClosing = `${ch} — Learn Smarter. Code Faster.`;
 
+  // Section 9: Concise Hashtags (5-8 topic-relevant tags placed strictly at the bottom)
   const hashtags = new Set();
-  hashtags.add('#' + primaryTopic.replace(/[^a-zA-Z0-9]/g, ''));
-  hashtags.add('#CICD');
-  hashtags.add('#DevOps');
-  hashtags.add('#PipelineOptimization');
-  hashtags.add('#CloudEngineering');
+  const cleanCoreHash = '#' + coreSubject.replace(/[^a-zA-Z0-9]/g, '');
+  if (cleanCoreHash.length > 1) {
+    hashtags.add(cleanCoreHash);
+  }
+  if (isBranchPolicyTopic) {
+    hashtags.add('#AzureDevOps');
+    hashtags.add('#AzureRepos');
+    hashtags.add('#BranchPolicies');
+    hashtags.add('#PullRequests');
+    hashtags.add('#BuildValidation');
+    hashtags.add('#GitWorkflow');
+  } else if (isPipelineTopic) {
+    hashtags.add('#AzureDevOps');
+    hashtags.add('#CICD');
+    hashtags.add('#DevOps');
+    hashtags.add('#PipelineOptimization');
+    hashtags.add('#CloudEngineering');
+  } else {
+    hashtags.add('#DevOps');
+    hashtags.add('#CloudEngineering');
+    hashtags.add('#SoftwareEngineering');
+  }
   hashtags.add('#' + ch.replace(/[^a-zA-Z0-9]/g, ''));
   hashtags.add('#Shorts');
   const hashtagLine = Array.from(hashtags).join(' ');
