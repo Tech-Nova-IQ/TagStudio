@@ -1,0 +1,72 @@
+# CodeRabbit Configuration File
+# Synced with GSD (Get Shit Done) Protocol, Architecture, and Project Rules
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+
+language: "en-US"
+tone_instructions: >
+  You are an expert code reviewer strictly aligned with the TechNova Tag Studio
+  GSD (Get Shit Done) development methodology. Review changes against the
+  project specifications in .gsd/SPEC.md, active roadmap in .gsd/ROADMAP.md,
+  and canonical rules in PROJECT_RULES.md. Be concise, direct, and actionable.
+
+early_access: false
+
+reviews:
+  profile: "assertive"
+  request_changes_workflow: true
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - "main"
+      - "master"
+  path_filters:
+    - "!target/**"
+    - "!.mvn/**"
+    - "!*.cmd"
+    - "!*.log"
+    - "!.agent/**"
+    - "!.gemini/**"
+  path_instructions:
+    - path: "src/main/java/com/technova/tagstudio/service/TagGeneratorService.java"
+      instructions: >
+        CRITICAL RULE: This file is strictly FROZEN and PROTECTED.
+        Do NOT allow or suggest any modifications to TagGeneratorService.java under
+        any circumstances. Any PR modifying this file must be flagged and rejected.
+
+    - path: "src/main/java/com/technova/tagstudio/security/**"
+      instructions: >
+        Enforce Spring Security 6 best practices. Passwords must be encoded using BCrypt.
+        Authorities must be ROLE_ADMIN and ROLE_USER. Unauthenticated or unauthorized
+        requests to /admin/** must be blocked with HTTP 403 / Access Denied. Never allow
+        normal users to escalate their own privileges.
+
+    - path: "src/main/java/com/technova/tagstudio/service/AuthService.java"
+      instructions: >
+        Ensure verification tokens are never stored in plain text (must be SHA-256 hashed).
+        Enforce token expiration, single-use invalidation, and rate limiting on resend requests.
+
+    - path: "src/main/java/com/technova/tagstudio/service/AdminService.java"
+      instructions: >
+        All administrative actions must be authorized, transactional, and audited in the
+        AdminAuditLog. Crucially, enforce that the last active administrator cannot be
+        disabled, locked, demoted to USER, or deleted.
+
+    - path: "src/main/java/com/technova/tagstudio/service/ChatService.java"
+      instructions: >
+        Ensure YouTube description copy preserves zero-width spaces (\u200B) on empty lines
+        for YouTube Shorts compatibility. Strip markdown bold asterisks and raw HTML tags.
+        Ensure Google Gemini API calls have resilient exponential backoff for HTTP 503 and
+        never leak API keys into application logs.
+
+    - path: ".gsd/**"
+      instructions: >
+        These files represent the GSD methodology state. Ensure updates reflect actual
+        empirical evidence and follow the SPEC -> PLAN -> EXECUTE -> VERIFY -> COMMIT protocol.
+
+chat:
+  auto_reply: true
