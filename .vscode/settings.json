@@ -1,5 +1,6 @@
 {
     "java.compile.nullAnalysis.mode": "disabled",
     "git.enabled": true,
-    "git.path": "C:\\Program Files\\Git\\cmd\\git.exe"
+    "git.path": "C:\\Program Files\\Git\\cmd\\git.exe",
+    "java.configuration.updateBuildConfiguration": "interactive"
 }
