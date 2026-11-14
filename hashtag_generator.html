@@ -1,0 +1,1875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TechNova Tag Studio — Hashtag, Keyword & Metadata Console</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#131921">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+  /* Amazon-Inspired Design System Tokens */
+  :root {
+    --bg: #eaeded;
+    --panel: #ffffff;
+    --panel-2: #f7f8f8;
+    --border: #d5d9d9;
+    --text: #0f1111;
+    --muted: #565959;
+    
+    /* Amazon Primary CTA (Yellow) */
+    --primary: #ffd814;
+    --primary-border: #fcd200;
+    --primary-hover: #f7ca00;
+    --primary-text: #0f1111;
+    --primary-soft: #fff8e7;
+
+    /* Amazon Dark Header/Nav Tones */
+    --nav-bg: #131921;
+    --nav-sub: #232f3e;
+    --nav-text: #ffffff;
+    
+    /* Amazon Accent Palette */
+    --accent-orange: #e77600;
+    --accent-orange-hover: #c7511f;
+    --accent-teal: #007185;
+    --accent-teal-hover: #004b57;
+    --cyan: #007185;
+    --amber: #b12704;
+    --rose: #ba0933;
+    --violet: #5c2d91;
+    --green: #067d62;
+
+    --shadow: 0 1px 3px rgba(15, 17, 17, 0.15);
+    --shadow-lg: 0 4px 12px rgba(15, 17, 17, 0.15);
+  }
+
+  html[data-theme="dark"] {
+    --bg: #0f1111;
+    --panel: #191e26;
+    --panel-2: #232f3e;
+    --border: #3a4553;
+    --text: #f3f4f6;
+    --muted: #94a3b8;
+    
+    --primary: #ffd814;
+    --primary-border: #fcd200;
+    --primary-hover: #f7ca00;
+    --primary-text: #0f1111;
+    --primary-soft: #282d37;
+
+    --nav-bg: #131921;
+    --nav-sub: #191e26;
+    --nav-text: #ffffff;
+
+    --accent-orange: #ff9900;
+    --accent-orange-hover: #e77600;
+    --accent-teal: #22d3ee;
+    --accent-teal-hover: #38bdf8;
+    --cyan: #22d3ee;
+    --amber: #fbbf24;
+    --rose: #f87171;
+    --violet: #c4b5fd;
+    --green: #34d399;
+
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); }
+  body { font-family: 'Inter', system-ui, -apple-system, sans-serif; padding: 0 0 60px; -webkit-font-smoothing: antialiased; }
+  .mono { font-family: 'IBM Plex Mono', 'JetBrains Mono', ui-monospace, monospace; }
+
+  /* Amazon Header Banner */
+  .topbar { display: flex; align-items: center; justify-content: space-between; background: var(--nav-bg); padding: 14px 24px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand-mark { width: 36px; height: 36px; border-radius: 6px; background: var(--primary); color: #0f1111; border: 1px solid var(--primary-border); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; font-family: 'Inter', sans-serif; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+  h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; color: var(--nav-text); margin: 0; }
+  .sub { color: var(--muted); font-size: 13.5px; margin: 0 24px 20px; line-height: 1.55; }
+
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 20px; }
+
+  /* Amazon Theme Toggle */
+  .themetoggle { font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 600; background: var(--nav-sub); border: 1px solid rgba(255,255,255,0.2); color: #ffffff; padding: 7px 16px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all .15s ease; }
+  .themetoggle:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.35); }
+
+  /* Amazon Card Panel */
+  .console { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; position: relative; overflow: visible; z-index: 20; margin-bottom: 24px; box-shadow: var(--shadow); }
+  .console-body { padding: 24px; }
+  .field-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+  .field { flex: 1; min-width: 220px; }
+  label { display: block; font-size: 12.5px; font-weight: 700; letter-spacing: .01em; color: var(--text); margin-bottom: 7px; }
+  select, input[type=text] { width: 100%; background: var(--panel); border: 1px solid #888c8c; color: var(--text); padding: 10px 12px; border-radius: 4px; font-family: 'Inter', sans-serif; font-size: 13.5px; transition: border-color .15s, box-shadow .15s; }
+  html[data-theme="dark"] select, html[data-theme="dark"] input[type=text] { background: var(--panel-2); border-color: var(--border); }
+  select:focus, input:focus { outline: none; border-color: var(--accent-orange) !important; box-shadow: 0 0 0 3px rgba(231, 118, 0, 0.25) !important; }
+  input[type=text]:disabled { opacity: .45; cursor: not-allowed; background: var(--panel-2); }
+
+  /* Multi-Select Categories Dropdown Widget */
+  .multiselect-container { position: relative; margin: 10px 0 0; }
+  .dropdown-trigger { width: 100%; background: var(--panel); border: 1px solid #888c8c; color: var(--text); padding: 8px 12px; border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 42px; transition: border-color .15s ease, box-shadow .15s ease; }
+  html[data-theme="dark"] .dropdown-trigger { background: var(--panel-2); border-color: var(--border); }
+  .dropdown-trigger:hover { border-color: #a8acac; }
+  .dropdown-trigger:focus { outline: none; border-color: var(--accent-orange) !important; box-shadow: 0 0 0 3px rgba(231, 118, 0, 0.25) !important; }
+  .dropdown-chips { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; min-width: 0; align-items: center; }
+  .badge-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; padding: 3px 8px; border-radius: 4px; background: var(--panel-2); border: 1px solid var(--border); color: var(--text); }
+  .badge-chip .remove-badge { font-size: 10px; color: var(--muted); cursor: pointer; margin-left: 2px; }
+  .badge-chip .remove-badge:hover { color: var(--rose); }
+  .dropdown-popover { display: none; position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; box-shadow: var(--shadow-lg); z-index: 1000; padding: 12px 14px; max-height: 280px; overflow-y: auto; }
+  .dropdown-popover::-webkit-scrollbar { width: 6px; }
+  .dropdown-popover::-webkit-scrollbar-track { background: var(--panel-2); border-radius: 4px; }
+  .dropdown-popover::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .dropdown-popover::-webkit-scrollbar-thumb:hover { background: #a8acac; }
+  .dropdown-popover.open { display: block; animation: fadeIn .15s ease; }
+  .dropdown-header-actions { display: flex; align-items: center; justify-content: space-between; padding-bottom: 8px; margin-bottom: 10px; border-bottom: 1px solid var(--border); }
+  .action-btn-sm { background: transparent; border: none; color: var(--accent-teal); font-size: 11.5px; font-weight: 600; cursor: pointer; padding: 2px 6px; border-radius: 4px; }
+  .action-btn-sm:hover { color: var(--accent-orange); background: var(--panel-2); }
+  .dropdown-options-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 6px 10px; }
+  .dropdown-option-item { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 4px; cursor: pointer; user-select: none; font-size: 12.5px; font-weight: 500; transition: background .12s ease; }
+  .dropdown-option-item:hover { background: var(--panel-2); }
+  .dropdown-option-item input[type="checkbox"] { width: 15px; height: 15px; cursor: pointer; accent-color: var(--accent-orange); }
+
+  /* Amazon Primary CTA Button (#runBtn) */
+  .runbtn { margin-top: 16px; background: var(--primary); color: var(--primary-text); border: 1px solid var(--primary-border); font-family: 'Inter', sans-serif; font-weight: 700; font-size: 14px; padding: 10px 22px; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 5px rgba(213,217,217,0.5); transition: all .15s ease; }
+  .runbtn:hover { background: var(--primary-hover); border-color: #f2c200; transform: translateY(-1px); }
+  .runbtn:active { background: #f0b800; transform: translateY(0); }
+
+  .warn { font-family: 'Inter', sans-serif; font-size: 12.5px; color: var(--amber); margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--border); line-height: 1.6; }
+
+  /* Amazon Page Switcher Tabs */
+  .pagebar { display: flex; gap: 10px; margin-bottom: 20px; }
+  .pagebtn { flex: 1; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; padding: 14px 18px; background: var(--panel); border: 1px solid var(--border); color: var(--muted); cursor: pointer; border-radius: 8px; transition: all .15s ease; box-shadow: var(--shadow); }
+  .pagebtn:hover { border-color: #a8acac; color: var(--text); background: var(--panel-2); }
+  .pagebtn.active { border-color: var(--accent-orange); color: var(--text); background: var(--panel); border-bottom: 3px solid var(--accent-orange); box-shadow: 0 2px 6px rgba(231, 118, 0, 0.15); }
+  html[data-theme="dark"] .pagebtn.active { border-color: var(--primary); color: var(--text); border-bottom: 3px solid var(--primary); }
+
+  /* Masonry Grid Layout System */
+  .masonry-grid { columns: 3 320px; column-gap: 16px; width: 100%; }
+  .metadata-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; width: 100%; align-items: start; }
+
+  @media (max-width: 1024px) { .masonry-grid { columns: 2 280px; } }
+  @media (max-width: 640px) { .masonry-grid { columns: 1 100%; } }
+
+  .catblock, .metablock { break-inside: avoid; page-break-inside: avoid; display: inline-block; width: 100%; height: auto; align-self: start; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 16px; overflow: hidden; box-shadow: var(--shadow); transition: box-shadow .2s ease, border-color .2s ease; }
+  .catblock:hover, .metablock:hover { box-shadow: 0 4px 12px rgba(15, 17, 17, 0.12); border-color: #a8acac; }
+  .catblock-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; background: var(--panel-2); border-bottom: 1px solid var(--border); cursor: pointer; user-select: none; }
+  .catblock-head:focus-visible { outline: 2px solid var(--accent-orange); }
+  .catblock-head-left { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+  .catblock-head-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .expand-toggle { background: transparent; border: none; color: var(--muted); font-size: 11px; padding: 4px 6px; cursor: pointer; border-radius: 4px; transition: transform .2s ease, color .15s ease; }
+  .catblock-head:hover .expand-toggle { color: var(--text); }
+  .card-preview { padding: 12px 14px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .more-badge { display: inline-flex; align-items: center; gap: 4px; font-family: 'Inter', sans-serif; font-size: 11.5px; font-weight: 700; color: var(--accent-teal); background: var(--panel-2); border: 1px solid var(--border); padding: 5px 10px; border-radius: 6px; cursor: pointer; transition: all .15s ease; }
+  .more-badge:hover { color: var(--accent-orange); border-color: var(--accent-orange); background: var(--panel); }
+  .card-full { display: none; padding: 12px 14px; }
+  .catblock.expanded .card-full { display: block; animation: fadeIn .2s ease; }
+  .catblock.expanded .card-preview { display: none; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+  .catblock-head .name { font-family: 'Inter', sans-serif; font-size: 13.5px; font-weight: 700; display: flex; align-items: center; gap: 9px; }
+  .catblock-head .swatch { width: 10px; height: 10px; border-radius: 3px; }
+  .catblock-head .cnt { color: var(--muted); font-weight: 400; font-size: 12px; }
+
+  .copybtn { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; color: var(--text); background: var(--panel); border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; cursor: pointer; box-shadow: 0 1px 2px rgba(15,17,17,0.08); transition: all .15s ease; }
+  .copybtn:hover { background: var(--panel-2); border-color: #a8acac; color: var(--accent-orange); }
+
+  .taglist { padding: 14px 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; }
+  .tag { font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; background: var(--panel-2); border: 1px solid var(--border); padding: 8px 11px; border-radius: 6px; color: var(--text); display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .tag span.taglabel { flex: 1; min-width: 0; white-space: normal; word-break: break-word; line-height: 1.4; }
+  .tag .tagdim { color: var(--muted); opacity: .65; }
+  .tag .checkbtn, .tag .activitybadge { flex-shrink: 0; }
+  .checkbtn { background: transparent; border: 1px solid var(--border); color: var(--accent-teal); font-size: 10px; padding: 1px 5px; border-radius: 4px; cursor: pointer; }
+  .checkbtn:hover { color: var(--accent-orange); border-color: var(--accent-orange); }
+  .activitybadge { font-size: 10px; color: var(--green); }
+  .activitybadge.err { color: var(--rose); }
+
+  .copyall { display: block; width: 100%; margin-top: 6px; background: var(--panel); border: 1px solid var(--border); color: var(--text); font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 11px; border-radius: 8px; cursor: pointer; box-shadow: var(--shadow); transition: all .15s ease; }
+  .copyall:hover { border-color: var(--accent-orange); color: var(--accent-orange); }
+
+  /* Metadata tab */
+  .metablock { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 16px; overflow: hidden; box-shadow: var(--shadow); }
+  .metablock-head { padding: 12px 16px; background: var(--panel-2); border-bottom: 1px solid var(--border); font-family: 'Inter', sans-serif; font-size: 13.5px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+  .metablock-body { padding: 12px 14px; }
+  .titleopt { font-family: 'IBM Plex Mono', monospace; font-size: 13px; background: var(--panel-2); border: 1px solid var(--border); padding: 10px 12px; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; gap: 10px; align-items: center; transition: border-color .15s ease; }
+  .titleopt:hover { border-color: var(--accent-orange); }
+  .titleopt .len { color: var(--muted); font-size: 11px; white-space: nowrap; }
+  textarea { width: 100%; box-sizing: border-box; min-height: 72px; height: auto; background: var(--panel); border: 1px solid #888c8c; color: var(--text); font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; padding: 10px 12px; border-radius: 6px; line-height: 1.5; resize: vertical; }
+  html[data-theme="dark"] textarea { background: var(--panel-2); border-color: var(--border); }
+  textarea:focus { outline: none; border-color: var(--accent-orange) !important; box-shadow: 0 0 0 3px rgba(231, 118, 0, 0.25) !important; }
+  .charmeter { font-family: 'Inter', sans-serif; font-size: 11.5px; color: var(--muted); margin-top: 8px; }
+
+  .footnote { font-size: 12.5px; color: var(--muted); margin-top: 20px; line-height: 1.6; }
+  .toast { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateY(20px); background: #131921; color: #ffffff; padding: 10px 20px; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; opacity: 0; transition: all .2s ease; pointer-events: none; box-shadow: 0 4px 14px rgba(0, 0, 0, .25); border: 1px solid var(--accent-orange); }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* Amazon Primary Floating Chat Button (#chatBubble) */
+  .chatbubble { position: fixed; bottom: 24px; right: 24px; width: 56px; height: 56px; border-radius: 50%; background: var(--primary); color: var(--primary-text); border: 2px solid var(--primary-border); font-size: 24px; cursor: pointer; box-shadow: 0 4px 16px rgba(0, 0, 0, .2); z-index: 1000; display: flex; align-items: center; justify-content: center; transition: transform .15s ease, background .15s ease; }
+  .chatbubble:hover { background: var(--primary-hover); transform: scale(1.08); }
+  .chatwindow { position: fixed; bottom: 92px; right: 24px; width: 350px; max-width: calc(100vw - 40px); height: 480px; max-height: calc(100vh - 140px); background: var(--panel); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-lg); display: none; flex-direction: column; overflow: hidden; z-index: 1000; }
+  .chatwindow.open { display: flex; }
+  .chatwindow-head { background: var(--nav-bg); color: #ffffff; padding: 14px 16px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; border-bottom: 2px solid var(--accent-orange); }
+  .chatwindow-head .sub { font-size: 11px; font-weight: 400; opacity: .85; margin-top: 2px; }
+  .chatclose { background: transparent; border: none; color: #ffffff; font-size: 18px; cursor: pointer; opacity: .85; padding: 0 4px; }
+  .chatclose:hover { opacity: 1; }
+  .chatmsgs { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; background: var(--panel-2); }
+  .chatmsg { max-width: 85%; padding: 9px 12px; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 13px; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; }
+  .chatmsg.user { align-self: flex-end; background: var(--primary); color: var(--primary-text); border: 1px solid var(--primary-border); border-bottom-right-radius: 2px; }
+  .chatmsg.bot { align-self: flex-start; background: var(--panel); border: 1px solid var(--border); color: var(--text); border-bottom-left-radius: 2px; }
+  .chatmsg.bot.err { border-color: var(--rose); color: var(--rose); }
+  .chatmsg.bot.loading { color: var(--muted); font-style: italic; }
+  .chatinputrow { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--border); background: var(--panel); flex-shrink: 0; }
+  .chatinputrow input { flex: 1; border: 1px solid #888c8c; border-radius: 6px; padding: 9px 14px; font-family: 'Inter', sans-serif; font-size: 13px; background: var(--panel); color: var(--text); }
+  html[data-theme="dark"] .chatinputrow input { background: var(--panel-2); border-color: var(--border); }
+  .chatinputrow input:focus { outline: none; border-color: var(--accent-orange) !important; }
+  .chatsendbtn { width: 36px; height: 36px; border-radius: 6px; background: var(--primary); color: var(--primary-text); border: 1px solid var(--primary-border); cursor: pointer; flex-shrink: 0; font-size: 15px; display: flex; align-items: center; justify-content: center; transition: all .15s ease; }
+  .chatsendbtn:hover { background: var(--primary-hover); }
+  .chatsendbtn:disabled { opacity: .5; cursor: not-allowed; }
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">TS</div>
+      <div>
+        <h1>TechNova Tag Studio</h1>
+      </div>
+    </div>
+    <button class="themetoggle" id="themeToggle">☾ Dark</button>
+  </div>
+
+<div class="wrap">
+  <p class="sub">Hashtag, keyword &amp; YouTube metadata generator. 30 items per category, every category, no thinning out.</p>
+
+  <div class="console">
+    <div class="console-body">
+      <div class="field-row">
+        <div class="field">
+          <label>Channel name</label>
+          <input type="text" id="channelInput" value="TechNova IQ" placeholder="e.g. TechNova IQ">
+        </div>
+        <div class="field">
+          <label>Video topic (drives every tab — hashtags, keywords, metadata, playlist)</label>
+          <input type="text" id="topicInput" value="SQL Server Performance Tuning" placeholder="e.g. Fixing SQL Server deadlocks with DMVs">
+        </div>
+      </div>
+
+      <label style="margin-top:4px;">Categories (30 each)</label>
+      <div class="multiselect-container" id="catDropdown"></div>
+    </div>
+  </div>
+
+  <div id="results">
+    <div class="pagebar">
+      <button class="pagebtn active" data-page="shorts">📹 Shorts / Video Metadata</button>
+      <button class="pagebtn" data-page="playlist">🎞️ Playlist Metadata</button>
+      <button class="pagebtn" data-page="prompt">✨ Prompt</button>
+    </div>
+
+    <div class="resultmeta" id="resultMeta"></div>
+
+    <div id="page-shorts" class="pagepanel">
+      <details class="sectiondetails" id="details-metadata" open>
+        <summary class="sectionhead">📝 YouTube Metadata</summary>
+        <div id="tab-metadata"></div>
+      </details>
+      <details class="sectiondetails" open>
+        <summary class="sectionhead">🏷️ Hashtags</summary>
+        <div id="tab-hashtags"></div>
+      </details>
+      <details class="sectiondetails" open>
+        <summary class="sectionhead">🔑 Keywords</summary>
+        <div id="tab-keywords"></div>
+      </details>
+    </div>
+
+    <div id="page-playlist" class="pagepanel" style="display:none;">
+      <div id="tab-playlist"></div>
+    </div>
+
+    <div id="page-prompt" class="pagepanel" style="display:none;">
+      <div class="metablock">
+        <div class="metablock-head">
+          <span>✨ Prompt Interface</span>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="copybtn" id="generatePromptBtn" style="background:var(--primary);color:var(--primary-text);border-color:var(--primary-border);font-weight:700;">▶ Generate</button>
+            <button class="copybtn" id="copyPromptBtn">copy</button>
+            <button class="copybtn" id="clearPromptBtn">clear</button>
+          </div>
+        </div>
+        <div class="metablock-body">
+          <textarea id="promptArea" style="min-height:160px;" placeholder="Write, paste, or refine your prompts here..."></textarea>
+          <div class="charmeter" id="promptMeter"><span id="promptCharCount">0</span> characters</div>
+        </div>
+      </div>
+      <div id="promptResults" style="margin-top:20px;"></div>
+    </div>
+  </div>
+
+  <p class="footnote">"Low-competition" and "Hidden" are judgment calls based on phrasing length and specificity, not real search-volume data.</p>
+</div>
+
+<div class="toast" id="toast">Copied</div>
+
+<button class="chatbubble" id="chatBubble" title="Studio AI"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="6" ry="6"/><circle cx="8" cy="13" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="9" r="1.2" fill="currentColor" stroke="none"/><circle cx="16" cy="13" r="1.2" fill="currentColor" stroke="none"/><path d="M8 13 Q10 9 12 9 Q14 9 16 13" stroke-width="1.5"/></svg></button>
+<div class="chatwindow" id="chatWindow">
+  <div class="chatwindow-head">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="2" y="2" width="20" height="20" rx="6" ry="6"/><circle cx="8" cy="13" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="9" r="1.2" fill="currentColor" stroke="none"/><circle cx="16" cy="13" r="1.2" fill="currentColor" stroke="none"/><path d="M8 13 Q10 9 12 9 Q14 9 16 13" stroke-width="1.5"/></svg>
+      <div>Studio AI<div class="sub">How can I help you?</div></div>
+    </div>
+    <button class="chatclose" id="chatClose" title="Close">✕</button>
+  </div>
+  <div class="chatmsgs" id="chatMsgs">
+    <div class="chatmsg bot"><strong>Studio AI</strong><br>How can I help you?</div>
+  </div>
+  <div class="chatinputrow">
+    <input type="text" id="chatInput" placeholder="Ask Studio AI...">
+    <button class="chatsendbtn" id="chatSend">Send</button>
+  </div>
+</div>
+
+<script>
+const CATS = [
+  {key:'channel', label:'Channel', color:'#db2777'},
+  {key:'topic', label:'Topic', color:'#0891b2'},
+  {key:'core', label:'Core', color:'#d97706'},
+  {key:'database', label:'Database', color:'#7c3aed'},
+  {key:'devops', label:'DevOps', color:'#dc2626'},
+  {key:'monitoring', label:'Monitoring', color:'#059669'},
+  {key:'programming', label:'Programming', color:'#2563eb'},
+  {key:'shorts', label:'Shorts', color:'#c026d3'},
+  {key:'lowcomp', label:'Low-competition', color:'#a16207'},
+  {key:'hidden', label:'Hidden', color:'#4f46e5'},
+  {key:'seo', label:'SEO', color:'#0d9488'},
+];
+
+const CHANNEL_NAME = "TechNova IQ";
+const CHANNEL_T = ["{ch}","{ch} channel","{ch} tutorials","{ch} sql server tutorials","{ch} tech content","youtubeshorts","shorts","viral","trending","newvideo","videooftheday","contentcreator","creator","subscribe","watchnow","youtuber","explore","fyp","foryou","mustwatch","goviral","likeandsubscribe","viralcontent","newtrend","techshorts","techreview","techtips","techtrends","technology","machinelearning"];
+const TOPIC_T = ["{tool} tutorial","{tool} basics","{tool} explained","{tool} overview","{tool} complete guide","{tool} full course","{tool} crash course","{tool} roadmap","{tool} for beginners","{tool} advanced concepts","{tool} deep dive","{tool} architecture","{tool} fundamentals","{tool} hands on practice","{tool} practical guide","{tool} real world examples","{tool} use cases","{tool} best practices","{tool} tips and tricks","{tool} common mistakes","{tool} cheat sheet","{tool} interview questions","{tool} certification guide","{tool} career path","{tool} jobs","{tool} salary","{tool} trends 2026","{tool} learning path","{tool} vs alternatives","{tool} getting started"];
+const DATABASE_T = ["database design","database normalization","acid properties","indexing strategies","query optimization","backup strategy","disaster recovery","high availability","database replication","database sharding","data modeling","er diagrams","database security","access control","database migration","etl process","data warehousing","sql vs nosql","database administration","capacity planning","database monitoring","transaction isolation","database performance tuning","schema design","database certification","dba career path","dba salary","dba interview questions","database jobs","database trends 2026"];
+const DEVOPS_T = ["ci cd pipeline","infrastructure as code","containerization","docker basics","kubernetes basics","terraform","ansible","configuration management","gitops","continuous deployment","continuous integration","automated testing","monitoring and alerting","site reliability engineering","cloud migration","microservices","version control","git workflows","deployment automation","blue green deployment","canary release","devops culture","devops tools","devops roadmap","devops certification","devops interview questions","devops career path","devops salary","devops jobs","devops trends 2026"];
+const MONITORING_T = ["performance monitoring","query performance tuning","execution plan analysis","index tuning","wait statistics","deadlock detection","blocking analysis","resource utilization","cpu and memory monitoring","disk io monitoring","log monitoring","alerting systems","dashboards","observability","apm tools","database health checks","slow query analysis","capacity planning","monitoring best practices","monitoring tools","uptime monitoring","latency monitoring","error tracking","monitoring automation","real time monitoring","monitoring interview questions","monitoring career","sre monitoring","monitoring certification","monitoring trends 2026"];
+const PROGRAMMING_T = ["clean code","coding best practices","software design patterns","object oriented programming","data structures and algorithms","debugging techniques","code review","version control with git","unit testing","test driven development","software architecture","api development","backend development","programming interview questions","coding challenges","competitive programming","programming languages comparison","software engineering practices","code optimization","refactoring","programming career","coding bootcamp","programming certification","programming jobs","programming salary","programming roadmap","programming tips","programming for beginners","programming trends 2026","programming portfolio"];
+const SHORTS_T = ["youtube shorts","shorts tutorial","quick tips","sixty second tutorial","coding shorts","tech shorts","shorts for beginners","shorts explained","viral shorts","shorts script ideas","shorts hooks","shorts editing tips","shorts thumbnail ideas","shorts trends 2026","shorts algorithm","shorts vs long form","shorts monetization","shorts growth tips","shorts content ideas","shorts hashtags","shorts seo","shorts watch time","shorts retention","shorts call to action","shorts niche ideas","shorts for tech channel","shorts scripting","shorts b roll ideas","shorts posting schedule","shorts analytics"];
+const LOWCOMP_T = ["{tool} for absolute beginners","{tool} common errors explained","{tool} step by step guide","{tool} project for resume","{tool} mini project ideas","{tool} comparison guide","{tool} troubleshooting guide","{tool} setup on windows","{tool} setup on linux","{tool} configuration walkthrough","{tool} real interview questions","{tool} practical examples","{tool} for freshers","{tool} learning path","{tool} common doubts clarified","{tool} hands on exercises","{tool} exercises with solutions","{tool} notes pdf","{tool} cheat sheet download","{tool} short course","{tool} weekend project","{tool} portfolio project","{tool} case study","{tool} for career switchers","{tool} without coding background","{tool} self study plan","{tool} free resources","{tool} certification worth it","{tool} salary in india","{tool} job openings 2026"];
+const HIDDEN_T = ["{tool} dba jobs","{tool} career path","{tool} community","{tool} discord server","{tool} reddit community","{tool} forum discussions","{tool} user group","{tool} local meetup","{tool} conference talks","{tool} podcast recommendations","{tool} newsletter","{tool} blog recommendations","{tool} github repositories","{tool} open source contribution","{tool} mentorship programs","{tool} freelance gigs","{tool} remote jobs","{tool} contract roles","{tool} niche use cases","{tool} lesser known features","{tool} hidden gems","{tool} underrated tips","{tool} advanced tricks","{tool} internal tooling","{tool} enterprise use cases","{tool} startup use case","{tool} government sector jobs","{tool} banking sector jobs","{tool} healthcare sector use","{tool} interview red flags"];
+const SEO_T = ["{tool} 2026","{tool} tutorial for beginners 2026","{tool} full course free","{tool} crash course","{tool} roadmap 2026","{tool} interview questions and answers","{tool} certification guide","{tool} salary in india 2026","{tool} career guide","{tool} vs alternatives 2026","{tool} latest features","{tool} whats new","{tool} best practices 2026","{tool} tips for professionals","{tool} for resume","{tool} skills to learn","{tool} learning roadmap","{tool} free course","{tool} paid course worth it","{tool} youtube channel recommendations","{tool} book recommendations","{tool} documentation guide","{tool} official docs explained","{tool} community resources","{tool} trending topics","{tool} future scope","{tool} job market 2026","{tool} demand in india","{tool} top companies using","{tool} real world projects"];
+const CUSTOM_CORE_T = ["{tool} configuration","{tool} architecture deep dive","{tool} performance tuning","{tool} security best practices","{tool} common commands","{tool} advanced features","{tool} integration with other tools","{tool} troubleshooting common issues","{tool} version differences","{tool} migration guide","{tool} installation guide","{tool} monitoring setup","{tool} automation scripts","{tool} api usage","{tool} plugin ecosystem","{tool} configuration files explained","{tool} logging and debugging","{tool} scaling strategies","{tool} backup strategy","{tool} disaster recovery","{tool} cost optimization","{tool} cloud deployment","{tool} on premise setup","{tool} cli commands","{tool} gui walkthrough","{tool} common pitfalls","{tool} production checklist","{tool} testing strategy","{tool} documentation deep dive","{tool} community best practices"];
+
+let activeCats = new Set(CATS.map(c=>c.key));
+let currentData = null;
+
+function renderCatDropdown(keepOpen = false){
+  const container = document.getElementById('catDropdown');
+  if(!container) return;
+  container.innerHTML = '';
+
+  const selectedList = CATS.filter(c => activeCats.has(c.key));
+
+  let triggerChipsHtml = '';
+  if (selectedList.length === 0) {
+    triggerChipsHtml = '<span style="color:var(--muted)">Select categories...</span>';
+  } else if (selectedList.length <= 4) {
+    triggerChipsHtml = selectedList.map(c => `
+      <span class="badge-chip">
+        <span class="swatch" style="display:inline-block;width:7px;height:7px;border-radius:2px;background:${c.color}"></span>
+        ${c.label}
+      </span>
+    `).join('');
+  } else {
+    const visibleChips = selectedList.slice(0, 3).map(c => `
+      <span class="badge-chip">
+        <span class="swatch" style="display:inline-block;width:7px;height:7px;border-radius:2px;background:${c.color}"></span>
+        ${c.label}
+      </span>
+    `).join('');
+    const extraCount = selectedList.length - 3;
+    triggerChipsHtml = visibleChips + `<span class="badge-chip">+${extraCount} more</span>`;
+  }
+
+  const dropdownHtml = `
+    <div class="dropdown-trigger" id="dropdownTrigger" tabindex="0" role="button" aria-haspopup="true" aria-expanded="false">
+      <div class="dropdown-chips">
+        <strong style="margin-right:6px;font-size:12.5px;">Categories (${selectedList.length}/${CATS.length}):</strong>
+        ${triggerChipsHtml}
+      </div>
+      <span class="dropdown-arrow" style="font-size:10px;color:var(--muted);">▼</span>
+    </div>
+    <div class="dropdown-popover" id="dropdownPopover" role="menu">
+      <div class="dropdown-header-actions">
+        <span style="font-size:11.5px;font-weight:700;color:var(--text);">Filter Categories (30 each)</span>
+        <div>
+          <button class="action-btn-sm" id="selectAllCats">Select All</button>
+          <button class="action-btn-sm" id="clearAllCats">Clear All</button>
+        </div>
+      </div>
+      <div class="dropdown-options-grid">
+        ${CATS.map(c => `
+          <label class="dropdown-option-item">
+            <input type="checkbox" value="${c.key}" ${activeCats.has(c.key) ? 'checked' : ''}>
+            <span class="swatch" style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${c.color}"></span>
+            <span>${c.label}</span>
+          </label>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  container.innerHTML = dropdownHtml;
+
+  const trigger = container.querySelector('#dropdownTrigger');
+  const popover = container.querySelector('#dropdownPopover');
+  const arrow = container.querySelector('.dropdown-arrow');
+
+  const togglePopover = (open) => {
+    const isOpen = open !== undefined ? open : !popover.classList.contains('open');
+    popover.classList.toggle('open', isOpen);
+    trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    arrow.textContent = isOpen ? '▲' : '▼';
+  };
+
+  if (keepOpen) {
+    togglePopover(true);
+  }
+
+  trigger.onclick = (e) => {
+    e.stopPropagation();
+    togglePopover();
+  };
+
+  trigger.onkeydown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      togglePopover();
+    } else if (e.key === 'Escape') {
+      togglePopover(false);
+    }
+  };
+
+  container.querySelector('#selectAllCats').onclick = (e) => {
+    e.stopPropagation();
+    CATS.forEach(c => activeCats.add(c.key));
+    renderCatDropdown(true);
+    if(currentData) { generate(); }
+  };
+
+  container.querySelector('#clearAllCats').onclick = (e) => {
+    e.stopPropagation();
+    activeCats.clear();
+    renderCatDropdown(true);
+    if(currentData) { generate(); }
+  };
+
+  popover.querySelectorAll('input[type="checkbox"]').forEach(chk => {
+    chk.onclick = (e) => {
+      e.stopPropagation();
+      const key = chk.value;
+      if (chk.checked) activeCats.add(key);
+      else activeCats.delete(key);
+      renderCatDropdown(true);
+      if(currentData) { generate(); }
+    };
+  });
+
+  if (!window.__catDropdownOutsideBound) {
+    window.__catDropdownOutsideBound = true;
+    document.addEventListener('click', (e) => {
+      const dropdownEl = document.getElementById('catDropdown');
+      if (dropdownEl && !dropdownEl.contains(e.target)) {
+        const pop = dropdownEl.querySelector('#dropdownPopover');
+        const trg = dropdownEl.querySelector('#dropdownTrigger');
+        const arw = dropdownEl.querySelector('.dropdown-arrow');
+        if (pop && pop.classList.contains('open')) {
+          pop.classList.remove('open');
+          if(trg) trg.setAttribute('aria-expanded', 'false');
+          if(arw) arw.textContent = '▼';
+        }
+      }
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const dropdownEl = document.getElementById('catDropdown');
+        if (dropdownEl) {
+          const pop = dropdownEl.querySelector('#dropdownPopover');
+          const trg = dropdownEl.querySelector('#dropdownTrigger');
+          const arw = dropdownEl.querySelector('.dropdown-arrow');
+          if (pop && pop.classList.contains('open')) {
+            pop.classList.remove('open');
+            if(trg) trg.setAttribute('aria-expanded', 'false');
+            if(arw) arw.textContent = '▼';
+          }
+        }
+      }
+    });
+  }
+}
+
+function currentChannelName(){
+  const el = document.getElementById('channelInput');
+  return (el && el.value.trim()) || CHANNEL_NAME;
+}
+
+function dedupeAdjacentWords(phrase){
+  const words = phrase.split(/\s+/);
+  for(let len = Math.floor(words.length/2); len >= 1; len--){
+    for(let start=0; start+2*len <= words.length; start++){
+      const a = words.slice(start, start+len).join(' ');
+      const b = words.slice(start+len, start+2*len).join(' ');
+      if(a === b){
+        return dedupeAdjacentWords(words.slice(0,start+len).concat(words.slice(start+2*len)).join(' '));
+      }
+    }
+  }
+  return phrase;
+}
+
+function fill(phrase, toolLower){ return dedupeAdjacentWords(phrase.replace(/\{tool\}/g, toolLower)); }
+
+function padTo30(arr){
+  const out = arr.slice(0,30);
+  let i=0;
+  while(out.length<30){ out.push(arr[i % arr.length] + ' ' + (['tips','explained','guide','notes'][i % 4])); i++; }
+  return out;
+}
+
+function buildPools(){
+  const videoTopic = document.getElementById('topicInput').value.trim() || 'Your Topic';
+  const topicSubject = shortSubject(videoTopic, 4).toLowerCase();
+  const coreLabel = shortSubject(videoTopic, 3).replace(/\b\w/g, c=>c.toUpperCase()) || 'Core';
+  const coreRaw = CUSTOM_CORE_T.map(t=>fill(t, topicSubject));
+
+  return {
+    toolDisplay: videoTopic, coreLabel,
+    cats: {
+      channel: padTo30(CHANNEL_T.map(t=>t.replace(/\{ch\}/g, currentChannelName().toLowerCase()))),
+      topic: padTo30(TOPIC_T.map(t=>fill(t, topicSubject))),
+      core: padTo30(coreRaw),
+      database: padTo30(DATABASE_T),
+      devops: padTo30(DEVOPS_T),
+      monitoring: padTo30(MONITORING_T),
+      programming: padTo30(PROGRAMMING_T),
+      shorts: padTo30(SHORTS_T),
+      lowcomp: padTo30(LOWCOMP_T.map(t=>fill(t, topicSubject))),
+      hidden: padTo30(HIDDEN_T.map(t=>fill(t, topicSubject))),
+      seo: padTo30(SEO_T.map(t=>fill(t, topicSubject))),
+    }
+  };
+}
+
+function toHashtag(phrase){
+  const cleaned = phrase.replace(/[^a-zA-Z0-9\s]/g, ' ').trim();
+  const words = cleaned.split(/\s+/).filter(Boolean);
+  return '#' + words.map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join('');
+}
+
+function shortSubject(text, maxWords){
+  const cleaned = text.replace(/[^a-zA-Z0-9\s]/g, ' ').replace(/\s+/g,' ').trim();
+  return cleaned.split(' ').slice(0, maxWords).join(' ');
+}
+
+function catLabel(key, coreLabel){
+  return key === 'core' ? coreLabel : CATS.find(c=>c.key===key).label;
+}
+
+function renderListTab(container, formatFn, isHashtagMode){
+  if(!container || !currentData) return;
+  const sep = isHashtagMode ? ' ' : ', ';
+  container.innerHTML = '';
+
+  const order = CATS.filter(c=>activeCats.has(c.key));
+  if(order.length===0){
+    container.innerHTML = '<p style="color:var(--muted);font-family:IBM Plex Mono,monospace;font-size:13px;">No categories selected.</p>';
+    return;
+  }
+
+  const masonryGrid = document.createElement('div');
+  masonryGrid.className = 'masonry-grid';
+
+  order.forEach(cat=>{
+    const items = currentData.cats[cat.key].map(formatFn);
+    const rawItems = currentData.cats[cat.key];
+    const totalCount = items.length;
+    const previewCount = Math.min(4, totalCount);
+    const remainingCount = totalCount - previewCount;
+
+    const block = document.createElement('div');
+    block.className = 'catblock';
+    
+    const previewItemsHtml = items.slice(0, previewCount).map((t,i)=>`
+      <span class="tag" data-raw="${rawItems[i].replace(/"/g,'&quot;')}">
+        <span class="taglabel">${t}</span>
+      </span>
+    `).join('');
+
+    const moreBadgeHtml = remainingCount > 0 
+      ? `<button class="more-badge" title="Expand category">+${remainingCount} more</button>` 
+      : '';
+
+    const fullItemsHtml = items.map((t,i)=>`
+      <span class="tag" data-raw="${rawItems[i].replace(/"/g,'&quot;')}">
+        <span class="taglabel">${t}</span>
+      </span>
+    `).join('');
+
+    block.innerHTML = `
+      <div class="catblock-head" tabindex="0" role="button" aria-expanded="false" title="Click to expand/collapse">
+        <div class="catblock-head-left">
+          <span class="swatch" style="background:${cat.color}"></span>
+          <span class="name">${catLabel(cat.key, currentData.coreLabel)}</span>
+          <span class="cnt">(${totalCount})</span>
+        </div>
+        <div class="catblock-head-right">
+          <button class="copybtn" title="Copy all ${totalCount} items">copy all ${totalCount}</button>
+          <button class="expand-toggle" aria-label="Toggle category expand">▼</button>
+        </div>
+      </div>
+      <div class="card-preview">
+        ${previewItemsHtml}
+        ${moreBadgeHtml}
+      </div>
+      <div class="card-full">
+        <div class="taglist" style="padding:0;">${fullItemsHtml}</div>
+      </div>
+    `;
+
+    const headEl = block.querySelector('.catblock-head');
+    const toggleBtn = block.querySelector('.expand-toggle');
+    const moreBadge = block.querySelector('.more-badge');
+
+    const toggleExpand = (e)=>{
+      if (e) e.stopPropagation();
+      const isExpanded = block.classList.toggle('expanded');
+      headEl.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+      toggleBtn.textContent = isExpanded ? '▲' : '▼';
+    };
+
+    headEl.onclick = (e)=> toggleExpand(e);
+    headEl.onkeydown = (e)=>{
+      if(e.key === 'Enter' || e.key === ' '){
+        e.preventDefault();
+        toggleExpand(e);
+      }
+    };
+    if(moreBadge){
+      moreBadge.onclick = (e)=> toggleExpand(e);
+    }
+
+    const copyBtn = block.querySelector('.copybtn');
+    copyBtn.onclick = (e)=>{
+      e.stopPropagation();
+      safeCopy(items.join(sep), `${catLabel(cat.key, currentData.coreLabel)} copied (${totalCount})`);
+    };
+
+    block.querySelectorAll('.tag').forEach(tagEl=>{
+      tagEl.onclick = (e)=>{
+        e.stopPropagation();
+        safeCopy(tagEl.querySelector('.taglabel').textContent, 'Tag copied');
+      };
+    });
+
+    masonryGrid.appendChild(block);
+  });
+
+  container.appendChild(masonryGrid);
+
+  const copyAllBtn = document.createElement('button');
+  copyAllBtn.className = 'copyall';
+  copyAllBtn.textContent = `Copy everything in this tab (${order.length * 30} items)`;
+  copyAllBtn.onclick = (e)=>{
+    e.stopPropagation();
+    const all = order.flatMap(cat=>currentData.cats[cat.key].map(formatFn));
+    safeCopy(all.join(sep), all.length + ' items copied');
+  };
+  container.appendChild(copyAllBtn);
+}
+
+// Helper to build a standard accordion card identical across tabs
+function createAccordionCardHelper({ id, title, color, copyButtons, contentHtml, container }) {
+  const block = document.createElement('div');
+  block.className = 'catblock';
+  if (id) block.id = id;
+
+  const copyBtnsHtml = (copyButtons || []).map(b =>
+    `<button class="copybtn" id="${b.btnId}">${b.label}</button>`
+  ).join('');
+
+  const swatchHtml = color ? `<span class="swatch" style="background:${color}"></span>` : '';
+
+  block.innerHTML = `
+    <div class="catblock-head" tabindex="0" role="button" aria-expanded="false" title="Click to expand/collapse">
+      <div class="catblock-head-left">
+        ${swatchHtml}
+        <span class="name">${title}</span>
+      </div>
+      <div class="catblock-head-right">
+        ${copyBtnsHtml}
+        <button class="expand-toggle" aria-label="Toggle section">▼</button>
+      </div>
+    </div>
+    <div class="card-full" style="padding:12px 14px;">
+      ${contentHtml}
+    </div>
+  `;
+
+  const headEl  = block.querySelector('.catblock-head');
+  const toggleBtn = block.querySelector('.expand-toggle');
+  const toggleExpand = (e) => {
+    if (e) e.stopPropagation();
+    const isExpanded = block.classList.toggle('expanded');
+    headEl.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+    toggleBtn.textContent = isExpanded ? '▲' : '▼';
+  };
+
+  headEl.onclick   = (e) => toggleExpand(e);
+  headEl.onkeydown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggleExpand(e);
+    }
+  };
+
+  (copyButtons || []).forEach(b => {
+    const btn = block.querySelector('#' + b.btnId);
+    if (btn) {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        b.action();
+      };
+    }
+  });
+
+  block.querySelectorAll('.tag').forEach(tagEl => {
+    tagEl.onclick = (e) => {
+      e.stopPropagation();
+      const lbl = tagEl.querySelector('.taglabel');
+      if (lbl) safeCopy(lbl.textContent, 'Copied');
+    };
+  });
+
+  if (container) {
+    container.appendChild(block);
+  }
+  return block;
+}
+
+function buildMetadataTab(container){
+  container.innerHTML = '';
+  const order = CATS.filter(c=>activeCats.has(c.key));
+  if(order.length===0){
+    container.innerHTML = '<p style="color:var(--muted);font-family:IBM Plex Mono,monospace;font-size:13px;">No categories selected.</p>';
+    return;
+  }
+
+  const metaHeaderGrid = document.createElement('div');
+  metaHeaderGrid.className = 'metadata-grid';
+  metaHeaderGrid.style.marginBottom = '20px';
+
+  const tool = currentData.toolDisplay;
+  const core30 = currentData.cats.core;
+  const topic30 = currentData.cats.topic;
+  const videoTopic = document.getElementById('topicInput').value.trim();
+  const channel = document.getElementById('channelInput').value.trim() || 'this channel';
+
+  const prompt = (document.getElementById('promptArea') && document.getElementById('promptArea').value.trim()) || '';
+
+  const topicWordsForHash = videoTopic ? TOPIC_T.map(t=>fill(t, shortSubject(videoTopic, 4).toLowerCase())) : null;
+
+  const titleCandidates = videoTopic ? [
+    `${videoTopic} — Full Explanation (2026)`,
+    `${videoTopic}: Step-by-Step Guide`,
+    `${videoTopic} Explained | ${channel}`,
+  ] : [
+    `${tool} Tutorial for Beginners | Complete Guide 2026`,
+    `${tool}: ${core30[0].charAt(0).toUpperCase()+core30[0].slice(1)} Explained Simply`,
+    `${tool} Interview Questions You Must Know (2026)`,
+  ];
+  const titleBlock = document.createElement('div');
+  titleBlock.className = 'metablock';
+  titleBlock.innerHTML = `<div class="metablock-head"><span>Title options</span><span style="color:var(--muted);font-weight:400;font-size:11px;">100 char limit</span></div><div class="metablock-body" id="titleList"></div>`;
+  metaHeaderGrid.appendChild(titleBlock);
+  const titleList = titleBlock.querySelector('#titleList');
+  titleCandidates.forEach(t=>{
+    const row = document.createElement('div');
+    row.className = 'titleopt';
+    const over = t.length > 100;
+    row.innerHTML = `<span>${t}</span><span class="len" style="color:${over?'var(--rose)':'var(--muted)'}">${t.length}/100</span>`;
+    row.style.cursor='pointer';
+    row.onclick = ()=>{ safeCopy(t, 'Title copied'); };
+    titleList.appendChild(row);
+  });
+
+  const subjectShort = videoTopic ? shortSubject(videoTopic, 4) : tool;
+  const topHashtags = videoTopic ? topicWordsForHash.slice(0,4).map(toHashtag).join(' ') : topic30.slice(0,4).map(toHashtag).join(' ');
+  const description =
+`Still doing this the hard way? You're already behind.
+Learn what ${subjectShort} is and how it works — in just 60 seconds.
+Perfect for Developers, DBAs, DevOps Engineers, QA Engineers, Cloud Engineers, and beginners preparing for ${subjectShort} interviews.
+✅ Subscribe ${channel} for practical ${subjectShort} Shorts.
+${topHashtags} #Shorts`;
+
+  const descBlock = document.createElement('div');
+  descBlock.className = 'metablock';
+  descBlock.innerHTML = `<div class="metablock-head"><span>Description template</span><button class="copybtn" id="copyDesc">copy</button></div><div class="metablock-body"><textarea id="descArea" style="min-height:140px;">${description}</textarea><div class="charmeter">Only the first 3-4 hashtags placed in a description show above the video title — rest still work for search, just not visibly.</div></div>`;
+  metaHeaderGrid.appendChild(descBlock);
+  descBlock.querySelector('#copyDesc').onclick = (e)=>{
+    e.stopPropagation();
+    safeCopy(document.getElementById('descArea').value, 'Description copied');
+  };
+
+  container.appendChild(metaHeaderGrid);
+
+  // 3️⃣ Call to Action (CTA)
+  const metaCtaText =
+    `👍 Like the video if this was helpful.\n` +
+    `🔔 Subscribe to ${channel} for more practical ${subjectShort} tutorials and Shorts.\n` +
+    `💬 Drop your questions and doubts in the comments below!`;
+
+  createAccordionCardHelper({
+    id: 'videoCta',
+    title: '3️⃣ Call to Action (CTA)',
+    copyButtons: [{
+      btnId: 'copyVideoCta',
+      label: 'copy',
+      action: () => safeCopy(document.getElementById('videoCtaArea').value, 'CTA copied')
+    }],
+    contentHtml: `
+      <textarea id="videoCtaArea" style="min-height:75px;">${metaCtaText}</textarea>
+      <div class="charmeter">Use at the end of your description or pin as a comment.</div>
+    `,
+    container: container
+  });
+
+  const tagsSectionHead = document.createElement('h3');
+  tagsSectionHead.className = 'sectionhead';
+  tagsSectionHead.textContent = '🏷️ Category Tags Fields (500-char limit)';
+  container.appendChild(tagsSectionHead);
+
+  const masonryGrid = document.createElement('div');
+  masonryGrid.className = 'masonry-grid';
+
+  const activeCatsList = CATS.filter(c=>activeCats.has(c.key));
+  activeCatsList.forEach(cat=>{
+    const items = currentData.cats[cat.key];
+    let str = '';
+    let cnt = 0;
+    for(const kw of items){
+      const candidate = str ? str + ', ' + kw : kw;
+      if(candidate.length > 480) break;
+      str = candidate;
+      cnt++;
+    }
+    
+    const areaId = 'tagsArea_' + cat.key;
+    const meterId = 'meter_' + cat.key;
+    const previewStr = str.length > 90 ? str.slice(0, 90) + '...' : str;
+
+    const block = document.createElement('div');
+    block.className = 'catblock';
+    block.innerHTML = `
+      <div class="catblock-head" tabindex="0" role="button" aria-expanded="false" title="Click to expand/collapse tags field">
+        <div class="catblock-head-left">
+          <span class="swatch" style="background:${cat.color}"></span>
+          <span class="name">${catLabel(cat.key, currentData.coreLabel)} tags field</span>
+        </div>
+        <div class="catblock-head-right">
+          <button class="copybtn" id="copy_${areaId}">copy</button>
+          <button class="expand-toggle" aria-label="Toggle tags field expand">▼</button>
+        </div>
+      </div>
+      <div class="card-preview">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text);width:100%;margin-bottom:6px;word-break:break-word;">
+          ${previewStr || '<span style="color:var(--muted)">No tags</span>'}
+        </div>
+        <div class="charmeter" style="width:100%;margin-top:0;">
+          <span>${str.length}</span>/500 chars &nbsp;·&nbsp; <span>${cnt}</span>/30 tags fit
+        </div>
+      </div>
+      <div class="card-full">
+        <textarea id="${areaId}" style="min-height:90px;">${str}</textarea>
+        <div class="charmeter" id="${meterId}">
+          <span id="${meterId}_chars">${str.length}</span>/500 characters &nbsp;·&nbsp;
+          <span id="${meterId}_tags">${cnt}</span>/30 tags fit
+          ${str.length > 500 ? ' <span style="color:var(--rose)">⚠ exceeds limit</span>' : ''}
+        </div>
+      </div>
+    `;
+
+    const headEl = block.querySelector('.catblock-head');
+    const toggleBtn = block.querySelector('.expand-toggle');
+    const toggleExpand = (e) => {
+      if (e) e.stopPropagation();
+      const isExpanded = block.classList.toggle('expanded');
+      headEl.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+      toggleBtn.textContent = isExpanded ? '▲' : '▼';
+    };
+
+    headEl.onclick = (e) => toggleExpand(e);
+    headEl.onkeydown = (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggleExpand(e);
+      }
+    };
+
+    block.querySelector('#copy_' + areaId).onclick = (e) => {
+      e.stopPropagation();
+      safeCopy(document.getElementById(areaId).value, catLabel(cat.key, currentData.coreLabel) + ' tags copied');
+    };
+
+    const ta = block.querySelector('#' + areaId);
+    const charsEl = block.querySelector('#' + meterId + '_chars');
+    const tagsEl  = block.querySelector('#' + meterId + '_tags');
+    const warnEl  = block.querySelector('#' + meterId);
+    ta.addEventListener('input', () => {
+      const v = ta.value;
+      const c = v.length;
+      const t = v ? v.split(',').filter(s => s.trim()).length : 0;
+      charsEl.textContent = c;
+      tagsEl.textContent  = t;
+      charsEl.style.color = c > 500 ? 'var(--rose)' : '';
+      let warnSpan = warnEl.querySelector('span[data-warn]');
+      if (c > 500) {
+        if (!warnSpan) {
+          warnSpan = document.createElement('span');
+          warnSpan.setAttribute('data-warn', '1');
+          warnSpan.style.color = 'var(--rose)';
+          warnSpan.textContent = ' ⚠ exceeds limit';
+          warnEl.appendChild(warnSpan);
+        }
+      } else if (warnSpan) {
+        warnSpan.remove();
+      }
+    });
+
+    masonryGrid.appendChild(block);
+  });
+
+  container.appendChild(masonryGrid);
+}
+
+function buildPlaylistTab(container){
+  container.innerHTML = '';
+  const order = CATS.filter(c=>activeCats.has(c.key));
+  if(order.length===0){
+    container.innerHTML = '<p style="color:var(--muted);font-family:IBM Plex Mono,monospace;font-size:13px;">No categories selected.</p>';
+    return;
+  }
+  const core30 = currentData.cats.core;
+  const channel = document.getElementById('channelInput').value.trim() || 'this channel';
+  const videoTopic = document.getElementById('topicInput').value.trim();
+  const subject = videoTopic || currentData.toolDisplay;
+  const subjectShort = shortSubject(subject, 4);
+  const subjectLower = subjectShort.toLowerCase();
+
+  const plTopicWords = TOPIC_T.map(t=>fill(t, subject.toLowerCase()));
+  const plTopicWordsForHash = TOPIC_T.map(t=>fill(t, subjectLower));
+
+  const masonryGrid = document.createElement('div');
+  masonryGrid.className = 'masonry-grid';
+
+  // Helper to build a standard accordion card identical to YouTube Metadata
+  function createAccordionCard({ id, title, color, copyButtons, contentHtml }) {
+    const block = document.createElement('div');
+    block.className = 'catblock';
+
+    const copyBtnsHtml = (copyButtons || []).map(b =>
+      `<button class="copybtn" id="${b.btnId}">${b.label}</button>`
+    ).join('');
+
+    const swatchHtml = color ? `<span class="swatch" style="background:${color}"></span>` : '';
+
+    block.innerHTML = `
+      <div class="catblock-head" tabindex="0" role="button" aria-expanded="false" title="Click to expand/collapse">
+        <div class="catblock-head-left">
+          ${swatchHtml}
+          <span class="name">${title}</span>
+        </div>
+        <div class="catblock-head-right">
+          ${copyBtnsHtml}
+          <button class="expand-toggle" aria-label="Toggle section">▼</button>
+        </div>
+      </div>
+      <div class="card-full" style="padding:12px 14px;">
+        ${contentHtml}
+      </div>
+    `;
+
+    const headEl  = block.querySelector('.catblock-head');
+    const toggleBtn = block.querySelector('.expand-toggle');
+    const toggleExpand = (e) => {
+      if (e) e.stopPropagation();
+      const isExpanded = block.classList.toggle('expanded');
+      headEl.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+      toggleBtn.textContent = isExpanded ? '▲' : '▼';
+    };
+
+    headEl.onclick   = (e) => toggleExpand(e);
+    headEl.onkeydown = (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggleExpand(e);
+      }
+    };
+
+    (copyButtons || []).forEach(b => {
+      const btn = block.querySelector('#' + b.btnId);
+      if (btn) {
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          b.action();
+        };
+      }
+    });
+
+    block.querySelectorAll('.tag').forEach(tagEl => {
+      tagEl.onclick = (e) => {
+        e.stopPropagation();
+        const lbl = tagEl.querySelector('.taglabel');
+        if (lbl) safeCopy(lbl.textContent, 'Copied');
+      };
+    });
+
+    masonryGrid.appendChild(block);
+    return block;
+  }
+
+  // 1️⃣ Playlist Name Options
+  const playlistTemplates = [
+    `${subject} — Full Playlist`,
+    `${subject} Tutorials`,
+    `Complete ${subject} Course`,
+    `${subject}: Zero to Hero`,
+    `Learn ${subject} Step by Step`,
+    `${subject} Explained (Full Series)`,
+    `${subject} Crash Course`,
+    `${subject} for Beginners`,
+    `Master ${subject}`,
+    `${subject} Deep Dive Series`,
+  ];
+  const nameRowsHtml = playlistTemplates.map(name => `
+    <div class="titleopt" style="cursor:pointer;" data-name="${name.replace(/"/g, '&quot;')}">
+      <span>${name}</span>
+      <span class="len">${name.length} chars</span>
+    </div>
+  `).join('');
+
+  const nameCard = createAccordionCard({
+    id: 'plnames',
+    title: '1️⃣ Playlist Name Options',
+    copyButtons: [{
+      btnId: 'copyPlNamesAll',
+      label: 'copy first',
+      action: () => safeCopy(playlistTemplates[0] || '', 'Playlist name copied')
+    }],
+    contentHtml: `
+      <div style="font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px;">Click any title option to copy</div>
+      <div>${nameRowsHtml}</div>
+    `
+  });
+  nameCard.querySelectorAll('.titleopt').forEach(el => {
+    el.onclick = (e) => {
+      e.stopPropagation();
+      safeCopy(el.getAttribute('data-name'), 'Playlist name copied');
+    };
+  });
+
+  // 2️⃣ Playlist Description
+  const shortAudience = ['Developers','DBAs','DevOps Engineers','QA Engineers','Cloud Engineers'];
+  const plHookLine = `Still figuring out ${subjectShort} the hard way? Start here.`;
+  const plBenefitLine = `Learn what ${subject} is and how it all comes together — one focused video at a time in this playlist.`;
+  const plAudienceLine = `Perfect for ${shortAudience.join(', ')}, and beginners preparing for ${subjectShort} interviews.`;
+  const plCTALine = `✅ Subscribe ${channel} for practical ${subjectShort} tutorials and Shorts.`;
+  const plHashLine = [toHashtag(subjectShort), ...currentData.cats.devops.slice(0,1).map(toHashtag), '#Shorts', toHashtag(channel)].join(' ');
+  const plDescription = [plHookLine, plBenefitLine, plAudienceLine, plCTALine, plHashLine].join('\n');
+  createAccordionCard({
+    id: 'pldesc',
+    title: '2️⃣ Playlist Description',
+    copyButtons: [{
+      btnId: 'copyPlDesc',
+      label: 'copy',
+      action: () => safeCopy(document.getElementById('plDescArea').value, 'Playlist description copied')
+    }],
+    contentHtml: `
+      <textarea id="plDescArea" style="min-height:120px;">${plDescription}</textarea>
+      <div class="charmeter" style="margin-top:6px;">${plDescription.length} characters</div>
+    `
+  });
+
+  // 3️⃣ Call to Action (CTA)
+  const ctaText =
+`👍 Like the videos if they help you.
+🚀 Subscribe to ${channel} for more ${subjectShort} tutorials and practical content.
+📚 Explore our other playlists to keep learning.`;
+  createAccordionCard({
+    id: 'plcta',
+    title: '3️⃣ Call to Action (CTA)',
+    copyButtons: [{
+      btnId: 'copyPlCta',
+      label: 'copy',
+      action: () => safeCopy(document.getElementById('plCtaArea').value, 'CTA copied')
+    }],
+    contentHtml: `
+      <textarea id="plCtaArea" style="min-height:75px;">${ctaText}</textarea>
+    `
+  });
+
+  // 4️⃣ Practical tags field
+  const plTagPool = [subject.toLowerCase(), channel.toLowerCase(), ...plTopicWords, ...core30.slice(0,5)];
+  const seenPl = new Set();
+  let plTagsStr = '';
+  for(const kw of plTagPool){
+    if(seenPl.has(kw)) continue;
+    const candidate = plTagsStr ? plTagsStr + ', ' + kw : kw;
+    if(candidate.length > 480) break;
+    plTagsStr = candidate;
+    seenPl.add(kw);
+  }
+  createAccordionCard({
+    id: 'pltags',
+    title: '🏷️ Practical Tags Field (≤500 chars)',
+    copyButtons: [{
+      btnId: 'copyPlTags',
+      label: 'copy',
+      action: () => safeCopy(document.getElementById('plTagsArea').value, 'Playlist keywords copied')
+    }],
+    contentHtml: `
+      <textarea id="plTagsArea" style="min-height:75px;">${plTagsStr}</textarea>
+      <div class="charmeter" style="margin-top:6px;">${plTagsStr.length}/500 chars · YouTube playlists have no native tags field — paste this in the description/title text.</div>
+    `
+  });
+
+  // 5️⃣ High Reach SEO Hashtags
+  const highReachPool = [...new Set([...plTopicWordsForHash.slice(0,6), ...CHANNEL_T.slice(5)])];
+  const highReachHashtags = highReachPool.slice(0,15).map(toHashtag);
+  createAccordionCard({
+    id: 'highreach',
+    title: '4️⃣ High Reach SEO Hashtags',
+    copyButtons: [{
+      btnId: 'copyHighReach',
+      label: 'copy all',
+      action: () => safeCopy(highReachHashtags.join(' '), 'High-reach hashtags copied')
+    }],
+    contentHtml: `
+      <div class="taglist" style="padding:0 0 6px;">
+        ${highReachHashtags.map(h => `<span class="tag"><span class="taglabel">${h}</span></span>`).join('')}
+      </div>
+    `
+  });
+
+  // 6️⃣ SEO Keywords / Tags list
+  const seoKeywordList = padTo30([...new Set([...plTopicWords, ...currentData.cats.seo])]);
+  createAccordionCard({
+    id: 'seokwlist',
+    title: '5️⃣ SEO Keywords / Tags Bank',
+    copyButtons: [{
+      btnId: 'copyPlSeoList',
+      label: 'copy all',
+      action: () => safeCopy(document.getElementById('plSeoListArea').value, 'SEO keyword list copied')
+    }],
+    contentHtml: `
+      <textarea id="plSeoListArea" style="min-height:110px;">${seoKeywordList.join('\n')}</textarea>
+      <div class="charmeter" style="margin-top:6px;">${seoKeywordList.length} keywords</div>
+    `
+  });
+
+  // 7️⃣ Thumbnail Concept
+  const thumbConcept =
+`Visual Layout
+Left: A person looking stressed at a failing process/error
+Center: Large "${subjectShort}" graphic with a glowing highlight
+Right: A successful outcome dashboard with green checkmarks
+Background: Code editor, workflow icons, cloud/server graphics
+Dynamic accent lines suggesting motion and progress
+
+Thumbnail Text (3–5 words)
+Master ${subjectShort}
+
+Colors
+Bright accent color, deep dark background, high-contrast white text, red for alerts, blue for tech elements
+
+Emotion Trigger
+From struggle to success — a clear before/after story.`;
+  createAccordionCard({
+    id: 'plthumb',
+    title: '6️⃣ Thumbnail Concept',
+    copyButtons: [{
+      btnId: 'copyPlThumb',
+      label: 'copy',
+      action: () => safeCopy(document.getElementById('plThumbArea').value, 'Thumbnail concept copied')
+    }],
+    contentHtml: `
+      <textarea id="plThumbArea" style="min-height:120px;">${thumbConcept}</textarea>
+    `
+  });
+
+  // 8️⃣ Thumbnail AI Image Prompt
+  const thumbPrompt = `A professional YouTube thumbnail featuring a focused person working at multiple monitors displaying dashboards, code, and workflow diagrams related to ${subject}. One side shows a failure state with red warning symbols and error indicators, while the other side transitions into a successful, automated outcome with green checkmarks and glowing progress indicators. Modern workspace with floating tech icons, code snippets, and workflow graphics. Cinematic YouTube thumbnail style with dramatic lighting, high contrast, dark background, sharp focus, vibrant accent colors for maximum CTR, ultra-detailed, modern technology environment, 16:9 aspect ratio.`;
+  createAccordionCard({
+    id: 'plthumbprompt',
+    title: '7️⃣ Thumbnail AI Image Prompt',
+    copyButtons: [{
+      btnId: 'copyPlThumbPrompt',
+      label: 'copy',
+      action: () => safeCopy(document.getElementById('plThumbPromptArea').value, 'Thumbnail prompt copied')
+    }],
+    contentHtml: `
+      <textarea id="plThumbPromptArea" style="min-height:85px;">${thumbPrompt}</textarea>
+    `
+  });
+
+  // ── ALL PLAYLIST SEO CATEGORIES (Channel, Topic, Core, Database, DevOps, Monitoring, Programming, Shorts, Low-comp, Hidden, SEO) ──
+  const activeCatsList = CATS.filter(c => activeCats.has(c.key));
+  activeCatsList.forEach(cat => {
+    const rawKeywords = currentData.cats[cat.key] || [];
+    const hashes = rawKeywords.map(toHashtag);
+    const kwText = rawKeywords.join('\n');
+
+    const hashTagsHtml = hashes.map(h => `<span class="tag"><span class="taglabel">${h}</span></span>`).join('');
+
+    const copyButtons = [];
+    if (hashes.length) {
+      copyButtons.push({
+        btnId: `copyHash_${cat.key}`,
+        label: 'copy hashtags',
+        action: () => safeCopy(hashes.join(' '), `${catLabel(cat.key, currentData.coreLabel)} hashtags copied`)
+      });
+    }
+    if (rawKeywords.length) {
+      copyButtons.push({
+        btnId: `copyKw_${cat.key}`,
+        label: 'copy keywords',
+        action: () => {
+          const ta = document.getElementById(`plKwArea_${cat.key}`);
+          safeCopy(ta ? ta.value : kwText, `${catLabel(cat.key, currentData.coreLabel)} keywords copied`);
+        }
+      });
+    }
+
+    createAccordionCard({
+      id: `plcat_${cat.key}`,
+      title: `${catLabel(cat.key, currentData.coreLabel)} SEO Set`,
+      color: cat.color,
+      copyButtons: copyButtons,
+      contentHtml: `
+        ${hashes.length ? `
+          <div style="font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;">Hashtags (${hashes.length})</div>
+          <div class="taglist" style="padding:0 0 10px;">${hashTagsHtml}</div>
+        ` : ''}
+        ${rawKeywords.length ? `
+          <div style="font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--muted);margin:6px 0;">Keywords (${rawKeywords.length})</div>
+          <textarea id="plKwArea_${cat.key}" style="min-height:85px;">${kwText}</textarea>
+        ` : ''}
+      `
+    });
+  });
+
+  container.appendChild(masonryGrid);
+}
+
+function generate(){
+  currentData = buildPools();
+  document.getElementById('results').style.display = 'block';
+  const order = CATS.filter(c=>activeCats.has(c.key));
+  document.getElementById('resultMeta').textContent = `-- ${order.length} categories × 30 = ${order.length*30} items  ·  topic: ${currentData.toolDisplay}`;
+
+  renderListTab(document.getElementById('tab-hashtags'), toHashtag, true);
+  renderListTab(document.getElementById('tab-keywords'), s=>s, false);
+  buildMetadataTab(document.getElementById('tab-metadata'));
+  buildPlaylistTab(document.getElementById('tab-playlist'));
+}
+
+function safeCopy(text, successMsg){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(
+      ()=>showToast(successMsg),
+      ()=>fallbackCopy(text, successMsg)
+    );
+  } else {
+    fallbackCopy(text, successMsg);
+  }
+}
+
+function fallbackCopy(text, successMsg){
+  try{
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast(ok ? successMsg : 'Copy blocked — select text manually');
+  } catch(e){
+    showToast('Copy blocked — select text manually');
+  }
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1400);
+}
+
+function switchToPage(pageKey){
+  document.querySelectorAll('.pagebtn').forEach(btn=>{
+    btn.classList.toggle('active', btn.dataset.page === pageKey);
+  });
+  document.querySelectorAll('.pagepanel').forEach(p=>p.style.display='none');
+  const target = document.getElementById('page-' + pageKey);
+  if(target) target.style.display = 'block';
+}
+
+document.querySelectorAll('.pagebtn').forEach(btn=>{
+  btn.onclick = ()=>{
+    switchToPage(btn.dataset.page);
+  };
+});
+
+
+document.getElementById('themeToggle').addEventListener('click', ()=>{
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  if(isDark){
+    html.removeAttribute('data-theme');
+    document.getElementById('themeToggle').textContent = '☾ Dark';
+  } else {
+    html.setAttribute('data-theme', 'dark');
+    document.getElementById('themeToggle').textContent = '☀ Light';
+  }
+});
+
+function scheduleAutoGenerate(){
+  clearTimeout(window.__autoGenTimer);
+  window.__autoGenTimer = setTimeout(generate, 150);
+}
+
+const chInput = document.getElementById('channelInput');
+const tpInput = document.getElementById('topicInput');
+if(chInput) {
+  chInput.addEventListener('input', scheduleAutoGenerate);
+  chInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') generate(); });
+}
+if(tpInput) {
+  tpInput.addEventListener('input', scheduleAutoGenerate);
+  tpInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') generate(); });
+}
+const rBtn = document.getElementById('runBtn');
+if(rBtn) rBtn.addEventListener('click', generate);
+
+
+let promptHistory = [];
+
+function cleanTopicString(str) {
+  if (!str) return '';
+  let s = str.trim();
+  s = s.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}📌*#_~`"']/gu, ' ').trim();
+  s = s.replace(/^(?:the\s+|my\s+)?topic\s*(?:is|:|=|-|\s)\s*/i, '');
+  s = s.replace(/^(?:the\s+)?topic\b\s*/i, '');
+  s = s.replace(/[*#_~`"':\-]/g, ' ').trim();
+  s = s.replace(/\s+(?:please|and\s+focus|focusing|focused|with|in\s+2026).*$/i, '').trim();
+  s = s.replace(/\s+/g, ' ').trim();
+  if (!s) return '';
+  return s.replace(/\b\w+/g, w => {
+    if (w.toLowerCase() === 'devops') return 'DevOps';
+    if (w.toLowerCase() === 'sql') return 'SQL';
+    if (w.toLowerCase() === 'api') return 'API';
+    if (w.toLowerCase() === 'aws') return 'AWS';
+    return w.charAt(0).toUpperCase() + w.slice(1);
+  });
+}
+
+function extractTopicFromPrompt(promptText) {
+  if (!promptText || !promptText.trim()) return null;
+  const p = promptText.trim();
+  const patterns = [
+    /(?:^|\n)\s*(?:the\s+|my\s+)?topic\s*[:=]\s*["']?([^"'\n\r]+)["']?/i,
+    /(?:my\s+|the\s+)?topic\s+(?:is|:|=)\s+([^.\n\r,;]+)/i,
+    /(?:create|generate|provide|write|make)\s+(?:the\s+)?(?:youtube\s+)?(?:metadata|tags|keywords|titles|hashtags|description|content|video)\s+(?:for|about|on)\s+(?:(?:the\s+)?topic\s*[:=]?\s*)?([^.\n\r,;]+)/i,
+    /(?:video|metadata|tags|tutorial|guide)\s+(?:for|about|on)\s+(?:(?:the\s+)?topic\s*[:=]?\s*)?([^.\n\r,;]+)/i
+  ];
+
+  for (const pattern of patterns) {
+    const m = p.match(pattern);
+    if (m && m[1]) {
+      const candidate = cleanTopicString(m[1]);
+      if (candidate) {
+        return candidate;
+      }
+    }
+  }
+
+  if (p.length < 100 && !p.includes('\n')) {
+    const candidate = cleanTopicString(p);
+    if (candidate) {
+      return candidate;
+    }
+  }
+
+  return null;
+}
+
+function generatePromptResult(){
+  const rawPrompt = (document.getElementById('promptArea') && document.getElementById('promptArea').value.trim()) || '';
+  if (!rawPrompt || !rawPrompt.trim()) {
+    showToast('Please enter a prompt');
+    return;
+  }
+
+  const extractedTopic = extractTopicFromPrompt(rawPrompt);
+  const topicInputEl = document.getElementById('topicInput');
+  const fallbackTopic = topicInputEl ? cleanTopicString(topicInputEl.value) : '';
+  const videoTopic = extractedTopic || fallbackTopic || 'SQL Server Performance Tuning';
+  const channel = currentChannelName();
+  const prompt = rawPrompt;
+  const topicSubject = shortSubject(videoTopic, 4).toLowerCase();
+
+  const pools = {
+    toolDisplay: videoTopic,
+    coreLabel: shortSubject(videoTopic, 3).replace(/\b\w/g, c=>c.toUpperCase()) || 'Core',
+    cats: {
+      channel: padTo30(CHANNEL_T.map(t=>t.replace(/\{ch\}/g, channel.toLowerCase()))),
+      topic: padTo30(TOPIC_T.map(t=>fill(t, topicSubject))),
+      core: padTo30(CUSTOM_CORE_T.map(t=>fill(t, topicSubject))),
+      database: padTo30(DATABASE_T),
+      devops: padTo30(DEVOPS_T),
+      monitoring: padTo30(MONITORING_T),
+      programming: padTo30(PROGRAMMING_T),
+      shorts: padTo30(SHORTS_T),
+      lowcomp: padTo30(LOWCOMP_T.map(t=>fill(t, topicSubject))),
+      hidden: padTo30(HIDDEN_T.map(t=>fill(t, topicSubject))),
+      seo: padTo30(SEO_T.map(t=>fill(t, topicSubject))),
+    }
+  };
+
+  let cleanPrompt = prompt ? prompt.replace(/[\r\n]+/g, ' ').replace(/^(?:the\s+|my\s+)?topic\s*(?:is|:|=|-|\s)\s*/i, '').slice(0, 57).trim() : '';
+  const titleCandidates = (cleanPrompt && cleanPrompt.toLowerCase() !== videoTopic.toLowerCase()) ? [
+    `${videoTopic} — ${cleanPrompt}`,
+    `${videoTopic}: Step-by-Step Guide (${channel})`,
+    `${videoTopic} Explained | ${channel}`,
+  ] : [
+    `${videoTopic} — Full Explanation (2026)`,
+    `${videoTopic}: Step-by-Step Guide`,
+    `${videoTopic} Explained | ${channel}`,
+  ];
+
+  const topicWordsForHash = TOPIC_T.map(t=>fill(t, topicSubject));
+  const topHashtags = topicWordsForHash.slice(0,4).map(toHashtag).join(' ');
+  const opener = `${videoTopic} — a full walkthrough from ${channel}, covering exactly what you need to know.`;
+  const description = `${opener}\n\nTimestamps:\n0:00 Intro\n0:30 What we're covering\n- add your real timestamps here -\n\nIn this video: ${topicWordsForHash.slice(0,8).join(', ')}.\n\nIf this helped, subscribe to ${channel} for more content like this.\n\n${topHashtags}`;
+
+  const ctaText =
+    `👍 Like the video if this was helpful.\n` +
+    `🔔 Subscribe to ${channel} for more practical ${cleanTopicString(videoTopic)} tutorials and Shorts.\n` +
+    `💬 Drop your questions and doubts in the comments below!`;
+
+  const entry = {
+    id: 'ph_' + Date.now(),
+    topic: videoTopic,
+    prompt: prompt,
+    titleCandidates,
+    description,
+    ctaText,
+    pools,
+    timestamp: new Date().toLocaleTimeString()
+  };
+
+  promptHistory.unshift(entry);
+  renderPromptHistory();
+  showToast('Prompt generated');
+}
+
+function renderPromptHistory(){
+  const container = document.getElementById('promptResults');
+  if(!container) return;
+  container.innerHTML = '';
+
+  const order = CATS.filter(c=>activeCats.has(c.key));
+
+  promptHistory.forEach((entry, idx) => {
+    const entryCard = document.createElement('div');
+    entryCard.className = 'prompt-history-entry';
+    entryCard.style.cssText = 'background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:20px;box-shadow:var(--shadow);';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:14px;font-weight:700;color:var(--text);">${entry.topic}</span>
+      </div>
+      <div style="font-size:11.5px;color:var(--muted);">${entry.timestamp}${entry.prompt ? ' · Prompt: ' + (entry.prompt.length > 40 ? entry.prompt.slice(0,37) + '...' : entry.prompt) : ''}</div>
+    `;
+    entryCard.appendChild(header);
+
+    const metaHeaderGrid = document.createElement('div');
+    metaHeaderGrid.className = 'metadata-grid';
+    metaHeaderGrid.style.marginBottom = '20px';
+
+    // Title Options Block
+    const titleBlock = document.createElement('div');
+    titleBlock.className = 'metablock';
+    titleBlock.innerHTML = `<div class="metablock-head"><span>Title options (Prompt)</span><span style="color:var(--muted);font-weight:400;font-size:11px;">100 char limit</span></div><div class="metablock-body" id="${entry.id}_promptTitleList"></div>`;
+    metaHeaderGrid.appendChild(titleBlock);
+    const titleList = titleBlock.querySelector('#' + entry.id + '_promptTitleList');
+    entry.titleCandidates.forEach(t=>{
+      const row = document.createElement('div');
+      row.className = 'titleopt';
+      const over = t.length > 100;
+      row.innerHTML = `<span>${t}</span><span class="len" style="color:${over?'var(--rose)':'var(--muted)'}">${t.length}/100</span>`;
+      row.style.cursor = 'pointer';
+      row.onclick = ()=>{ safeCopy(t, 'Title copied'); };
+      titleList.appendChild(row);
+    });
+
+    // Description Template Block
+    const descAreaId = entry.id + '_promptDescArea';
+    const descBlock = document.createElement('div');
+    descBlock.className = 'metablock';
+    descBlock.innerHTML = `<div class="metablock-head"><span>Description template</span><button class="copybtn" id="${entry.id}_copyPromptDesc">copy</button></div><div class="metablock-body"><textarea id="${descAreaId}" style="min-height:140px;">${entry.description}</textarea><div class="charmeter">Generated from prompt instructions &amp; selected categories.</div></div>`;
+    metaHeaderGrid.appendChild(descBlock);
+    descBlock.querySelector('#' + entry.id + '_copyPromptDesc').onclick = (e)=>{
+      e.stopPropagation();
+      safeCopy(document.getElementById(descAreaId).value, 'Description copied');
+    };
+
+    entryCard.appendChild(metaHeaderGrid);
+
+    // 3️⃣ Call to Action (CTA) Block
+    const ctaAreaId = entry.id + '_promptCtaArea';
+    const ctaCopyBtnId = entry.id + '_copyPromptCta';
+    const ctaText = entry.ctaText ||
+      `👍 Like the video if this was helpful.\n` +
+      `🔔 Subscribe to ${currentChannelName()} for more practical ${cleanTopicString(entry.topic)} tutorials and Shorts.\n` +
+      `💬 Drop your questions and doubts in the comments below!`;
+
+    createAccordionCardHelper({
+      id: entry.id + '_promptCtaBlock',
+      title: '3️⃣ Call to Action (CTA)',
+      copyButtons: [{
+        btnId: ctaCopyBtnId,
+        label: 'copy',
+        action: () => safeCopy(document.getElementById(ctaAreaId).value, 'CTA copied')
+      }],
+      contentHtml: `
+        <textarea id="${ctaAreaId}" style="min-height:75px;">${ctaText}</textarea>
+        <div class="charmeter">Use at the end of your description or pin as a comment.</div>
+      `,
+      container: entryCard
+    });
+
+    // Category tags, hashtags & keywords
+    if(order.length > 0) {
+      const tagsSectionHead = document.createElement('h3');
+      tagsSectionHead.className = 'sectionhead';
+      tagsSectionHead.textContent = '🏷️ Category Tags Fields (500-char limit)';
+      entryCard.appendChild(tagsSectionHead);
+
+      const tagsGrid = document.createElement('div');
+      tagsGrid.className = 'masonry-grid';
+      order.forEach(cat=>{
+        const items = entry.pools.cats[cat.key];
+        let str = '';
+        let cnt = 0;
+        for(const kw of items){
+          const candidate = str ? str + ', ' + kw : kw;
+          if(candidate.length > 480) break;
+          str = candidate;
+          cnt++;
+        }
+        const areaId = entry.id + '_tags_' + cat.key;
+        const block = document.createElement('div');
+        block.className = 'catblock';
+        block.innerHTML = `
+          <div class="catblock-head">
+            <div class="catblock-head-left">
+              <span class="swatch" style="background:${cat.color}"></span>
+              <span class="name">${catLabel(cat.key, entry.pools.coreLabel)} tags field</span>
+            </div>
+            <div class="catblock-head-right">
+              <button class="copybtn" id="copy_${areaId}">copy</button>
+            </div>
+          </div>
+          <div class="card-full" style="display:block;padding:12px 14px;">
+            <textarea id="${areaId}" style="min-height:75px;">${str}</textarea>
+            <div class="charmeter">${str.length}/500 chars · ${cnt}/30 tags</div>
+          </div>
+        `;
+        block.querySelector('#copy_' + areaId).onclick = (e)=>{
+          e.stopPropagation();
+          safeCopy(document.getElementById(areaId).value, catLabel(cat.key, entry.pools.coreLabel) + ' tags copied');
+        };
+        tagsGrid.appendChild(block);
+      });
+      entryCard.appendChild(tagsGrid);
+
+      const hashHead = document.createElement('h3');
+      hashHead.className = 'sectionhead';
+      hashHead.style.marginTop = '24px';
+      hashHead.textContent = '🏷️ Generated Hashtags';
+      entryCard.appendChild(hashHead);
+
+      const hashGrid = document.createElement('div');
+      hashGrid.className = 'masonry-grid';
+      order.forEach(cat=>{
+        const block = document.createElement('div');
+        block.className = 'catblock';
+        const items = entry.pools.cats[cat.key].map(toHashtag);
+        const btnId = entry.id + '_copyHash_' + cat.key;
+        block.innerHTML = `
+          <div class="catblock-head">
+            <div class="catblock-head-left">
+              <span class="swatch" style="background:${cat.color}"></span>
+              <span class="name">${catLabel(cat.key, entry.pools.coreLabel)}</span>
+              <span class="cnt">(${items.length})</span>
+            </div>
+            <div class="catblock-head-right">
+              <button class="copybtn" id="${btnId}">copy all</button>
+            </div>
+          </div>
+          <div class="card-full" style="display:block;padding:12px 14px;">
+            <div class="taglist" style="padding:0;">${items.map(h => `<span class="tag"><span class="taglabel">${h}</span></span>`).join('')}</div>
+          </div>
+        `;
+        block.querySelector('#' + btnId).onclick = (e)=>{
+          e.stopPropagation();
+          safeCopy(items.join(' '), `${catLabel(cat.key, entry.pools.coreLabel)} hashtags copied`);
+        };
+        block.querySelectorAll('.tag').forEach(tagEl => {
+          tagEl.onclick = (e)=>{
+            e.stopPropagation();
+            safeCopy(tagEl.querySelector('.taglabel').textContent, 'Tag copied');
+          };
+        });
+        hashGrid.appendChild(block);
+      });
+      entryCard.appendChild(hashGrid);
+
+      const kwHead = document.createElement('h3');
+      kwHead.className = 'sectionhead';
+      kwHead.style.marginTop = '24px';
+      kwHead.textContent = '🔑 Generated Keywords';
+      entryCard.appendChild(kwHead);
+
+      const kwGrid = document.createElement('div');
+      kwGrid.className = 'masonry-grid';
+      order.forEach(cat=>{
+        const block = document.createElement('div');
+        block.className = 'catblock';
+        const items = entry.pools.cats[cat.key];
+        const btnId = entry.id + '_copyKw_' + cat.key;
+        const kwAreaId = entry.id + '_kwArea_' + cat.key;
+        block.innerHTML = `
+          <div class="catblock-head">
+            <div class="catblock-head-left">
+              <span class="swatch" style="background:${cat.color}"></span>
+              <span class="name">${catLabel(cat.key, entry.pools.coreLabel)}</span>
+              <span class="cnt">(${items.length})</span>
+            </div>
+            <div class="catblock-head-right">
+              <button class="copybtn" id="${btnId}">copy all</button>
+            </div>
+          </div>
+          <div class="card-full" style="display:block;padding:12px 14px;">
+            <textarea id="${kwAreaId}" style="min-height:85px;">${items.join(', ')}</textarea>
+          </div>
+        `;
+        block.querySelector('#' + btnId).onclick = (e)=>{
+          e.stopPropagation();
+          safeCopy(document.getElementById(kwAreaId).value, `${catLabel(cat.key, entry.pools.coreLabel)} keywords copied`);
+        };
+        kwGrid.appendChild(block);
+      });
+      entryCard.appendChild(kwGrid);
+    }
+    container.appendChild(entryCard);
+  });
+}
+
+// Prompt Interface bindings
+const promptArea = document.getElementById('promptArea');
+const promptCharCount = document.getElementById('promptCharCount');
+const copyPromptBtn = document.getElementById('copyPromptBtn');
+const clearPromptBtn = document.getElementById('clearPromptBtn');
+const generatePromptBtn = document.getElementById('generatePromptBtn');
+
+if(promptArea) {
+  promptArea.addEventListener('input', () => {
+    if(promptCharCount) promptCharCount.textContent = promptArea.value.length;
+  });
+  promptArea.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      generatePromptResult();
+    }
+  });
+}
+if(generatePromptBtn) {
+  generatePromptBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    generatePromptResult();
+  });
+}
+if(copyPromptBtn && promptArea) {
+  copyPromptBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    safeCopy(promptArea.value, 'Prompt copied');
+  });
+}
+if(clearPromptBtn && promptArea) {
+  clearPromptBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    promptArea.value = '';
+    if(promptCharCount) promptCharCount.textContent = '0';
+    const promptResults = document.getElementById('promptResults');
+    if(promptResults) promptResults.innerHTML = '';
+    showToast('Prompt cleared');
+  });
+}
+
+// Studio AI Chatbot
+const chatBubble = document.getElementById('chatBubble');
+const chatWindow = document.getElementById('chatWindow');
+const chatClose = document.getElementById('chatClose');
+const chatInput = document.getElementById('chatInput');
+const chatSend = document.getElementById('chatSend');
+const chatMsgs = document.getElementById('chatMsgs');
+
+let chatHistory = [];
+
+function openStudioAi(initialText = '') {
+  if(!chatWindow) return;
+  chatWindow.classList.add('open');
+  if(chatInput) {
+    if(initialText) chatInput.value = initialText;
+    chatInput.focus();
+  }
+}
+
+function closeStudioAi() {
+  if(chatWindow) chatWindow.classList.remove('open');
+}
+
+function appendChatMsg(role, content, isHtml = false, isError = false, isLoading = false) {
+  if(!chatMsgs) return null;
+  const msg = document.createElement('div');
+  msg.className = `chatmsg ${role}${isError ? ' err' : ''}${isLoading ? ' loading' : ''}`;
+  if(isHtml) {
+    msg.innerHTML = content;
+  } else {
+    msg.textContent = content;
+  }
+  chatMsgs.appendChild(msg);
+  chatMsgs.scrollTop = chatMsgs.scrollHeight;
+  return msg;
+}
+
+let isStudioAiSending = false;
+
+async function sendStudioAiMessage() {
+  if(isStudioAiSending) return;
+  if(!chatInput || !chatSend) return;
+  const text = chatInput.value.trim();
+  if(!text) return;
+
+  isStudioAiSending = true;
+
+  // Append user message
+  appendChatMsg('user', text);
+  chatHistory.push({ role: 'user', content: text });
+  chatInput.value = '';
+
+  // Show loading state
+  chatInput.disabled = true;
+  chatSend.disabled = true;
+  const loadingEl = appendChatMsg('bot', 'Studio AI is thinking...', false, false, true);
+
+  try {
+    const topic = (document.getElementById('topicInput') && document.getElementById('topicInput').value.trim()) || '';
+    const channel = currentChannelName();
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ channel, topic, messages: chatHistory })
+    });
+
+    if(loadingEl && loadingEl.parentNode) {
+      loadingEl.parentNode.removeChild(loadingEl);
+    }
+
+    if(!res.ok) throw new Error('Network error');
+    const data = await res.json();
+
+    if(data.error) {
+      appendChatMsg('bot', data.error, false, true);
+    } else if(data.reply) {
+      const botMsgDiv = document.createElement('div');
+      botMsgDiv.className = 'chatmsg bot';
+      botMsgDiv.innerHTML = `<strong>Studio AI</strong><br>${data.reply.replace(/\n/g, '<br>')}`;
+      chatMsgs.appendChild(botMsgDiv);
+      chatMsgs.scrollTop = chatMsgs.scrollHeight;
+      chatHistory.push({ role: 'assistant', content: data.reply });
+    }
+  } catch(err) {
+    if(loadingEl && loadingEl.parentNode) {
+      loadingEl.parentNode.removeChild(loadingEl);
+    }
+    appendChatMsg('bot', 'Studio AI could not connect to server. Please try again.', false, true);
+  } finally {
+    isStudioAiSending = false;
+    chatInput.disabled = false;
+    chatSend.disabled = false;
+    chatInput.focus();
+  }
+}
+
+if(chatBubble) {
+  chatBubble.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if(chatWindow && chatWindow.classList.contains('open')) {
+      closeStudioAi();
+    } else {
+      openStudioAi();
+    }
+  });
+}
+
+if(chatClose) {
+  chatClose.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeStudioAi();
+  });
+}
+
+if(chatSend) {
+  chatSend.addEventListener('click', (e) => {
+    e.stopPropagation();
+    sendStudioAiMessage();
+  });
+}
+
+if(chatInput) {
+  chatInput.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter') {
+      e.preventDefault();
+      sendStudioAiMessage();
+    }
+  });
+}
+
+renderCatDropdown();
+generate();
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>

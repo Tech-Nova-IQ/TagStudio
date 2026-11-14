@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Verification – TechNova Tag Studio</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <style>
+    .auth-container {
+      max-width: 520px;
+      margin: 50px auto;
+      padding: 36px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: var(--shadow-lg);
+      text-align: center;
+    }
+    .icon-badge {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+    }
+    .icon-success {
+      background: rgba(6, 125, 98, 0.15);
+      color: var(--green);
+      border: 2px solid var(--green);
+    }
+    .icon-info {
+      background: rgba(0, 113, 133, 0.15);
+      color: var(--accent-teal);
+      border: 2px solid var(--accent-teal);
+    }
+    .icon-error {
+      background: rgba(186, 9, 51, 0.15);
+      color: var(--rose);
+      border: 2px solid var(--rose);
+    }
+    .auth-container h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0 0 12px;
+      color: var(--text);
+    }
+    .auth-container p {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .email-highlight {
+      font-weight: 700;
+      color: var(--text);
+    }
+    .btn-action {
+      display: inline-block;
+      padding: 12px 28px;
+      background: var(--primary);
+      border: 1px solid var(--primary-border);
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--primary-text);
+      text-decoration: none;
+      box-shadow: 0 2px 5px rgba(213, 217, 217, 0.5);
+    }
+    .btn-action:hover {
+      background: var(--primary-hover);
+    }
+    .btn-secondary {
+      display: inline-block;
+      padding: 11px 20px;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      margin-left: 10px;
+    }
+    .btn-secondary:hover {
+      background: var(--border);
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <a th:href="@{/}" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:#fff;">
+        <span style="font-size:20px;">⚡</span>
+        <span style="font-weight:800;font-size:18px;">TechNova Tag Studio</span>
+      </a>
+    </div>
+    <div style="display:flex;gap:12px;align-items:center;">
+      <a th:href="@{/login}" style="color:#fff;text-decoration:none;font-size:13px;font-weight:600;">Sign In</a>
+    </div>
+  </div>
+
+  <div class="auth-container">
+    <!-- Success State -->
+    <div th:if="${verified == true}">
+      <div class="icon-badge icon-success">✓</div>
+      <h1>Email Verified Successfully!</h1>
+      <p th:text="${message}">Your email has been confirmed and your account is now active.</p>
+      <a th:href="@{/login}" class="btn-action">Proceed to Sign In</a>
+    </div>
+
+    <!-- Error State -->
+    <div th:if="${verified == false}">
+      <div class="icon-badge icon-error">✕</div>
+      <h1>Verification Failed</h1>
+      <p th:text="${message}">Invalid or expired verification link.</p>
+      <div style="display:flex;justify-content:center;gap:12px;">
+        <a th:href="@{/resend-verification}" class="btn-action">Resend Verification Email</a>
+        <a th:href="@{/login}" class="btn-secondary">Back to Sign In</a>
+      </div>
+    </div>
+
+    <!-- Just Registered State -->
+    <div th:if="${verified == null && registered == true}">
+      <div class="icon-badge icon-info">✉</div>
+      <h1>Check Your Inbox</h1>
+      <p>
+        Registration successful! We sent a confirmation link to <span class="email-highlight" th:text="${email}">your email</span>.<br>
+        Please check your inbox (and spam folder) and click the link to activate your account.
+      </p>
+      <div style="margin-top:28px;">
+        <a th:href="@{/login}" class="btn-action">Go to Sign In</a>
+        <a th:href="@{/resend-verification}" class="btn-secondary">Didn't receive email?</a>
+      </div>
+    </div>
+
+    <!-- Default Prompt State -->
+    <div th:if="${verified == null && registered != true}">
+      <div class="icon-badge icon-info">ℹ</div>
+      <h1>Email Verification Required</h1>
+      <p th:text="${message}">Please verify your email to access TechNova Tag Studio.</p>
+      <a th:href="@{/resend-verification}" class="btn-action">Resend Verification Email</a>
+    </div>
+  </div>
+</body>
+</html>

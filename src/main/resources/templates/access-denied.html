@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Access Denied – TechNova Tag Studio</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <style>
+    .auth-container {
+      max-width: 500px;
+      margin: 60px auto;
+      padding: 36px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: var(--shadow-lg);
+      text-align: center;
+    }
+    .badge-denied {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      background: rgba(186, 9, 51, 0.15);
+      color: var(--rose);
+      border: 2px solid var(--rose);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      font-weight: 800;
+    }
+    .auth-container h1 {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--rose);
+      margin: 0 0 10px;
+    }
+    .auth-container p {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+    .btn-action {
+      display: inline-block;
+      padding: 12px 24px;
+      background: var(--primary);
+      border: 1px solid var(--primary-border);
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--primary-text);
+      text-decoration: none;
+      margin: 4px;
+    }
+    .btn-action:hover {
+      background: var(--primary-hover);
+    }
+    .btn-secondary {
+      display: inline-block;
+      padding: 11px 20px;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      margin: 4px;
+    }
+    .btn-secondary:hover {
+      background: var(--border);
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <a th:href="@{/}" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:#fff;">
+        <span style="font-size:20px;">⚡</span>
+        <span style="font-weight:800;font-size:18px;">TechNova Tag Studio</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="auth-container">
+    <div class="badge-denied">403</div>
+    <h1>Access Denied</h1>
+    <p>
+      You do not have administrative clearance (ROLE_ADMIN) to view this page or perform this operation.<br>
+      This security boundary is enforced strictly by Spring Security.
+    </p>
+
+    <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
+      <a th:href="@{/dashboard}" class="btn-action">User Dashboard</a>
+      <a th:href="@{/}" class="btn-secondary">Tag Studio Console</a>
+      <form th:action="@{/logout}" method="post" style="display:inline;">
+        <button type="submit" class="btn-secondary" style="cursor:pointer;">Switch Account</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Dashboard – TechNova Tag Studio</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <style>
+    .dashboard-container {
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+    .welcome-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px 32px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow);
+    }
+    .welcome-card h1 {
+      font-size: 24px;
+      font-weight: 800;
+      margin: 0 0 6px;
+      color: var(--text);
+    }
+    .welcome-card p {
+      color: var(--muted);
+      margin: 0;
+      font-size: 14px;
+    }
+    .profile-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .profile-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+    .profile-card .card-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .profile-card .card-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      word-break: break-all;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .status-active {
+      background: rgba(6, 125, 98, 0.15);
+      color: var(--green);
+      border: 1px solid var(--green);
+    }
+    .status-pending {
+      background: rgba(231, 118, 0, 0.15);
+      color: var(--accent-orange);
+      border: 1px solid var(--accent-orange);
+    }
+    .studio-action-card {
+      background: linear-gradient(135deg, var(--panel), var(--panel-2));
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 32px;
+      text-align: center;
+      box-shadow: var(--shadow-lg);
+    }
+    .studio-action-card h2 {
+      font-size: 20px;
+      font-weight: 800;
+      margin: 0 0 8px;
+      color: var(--text);
+    }
+    .studio-action-card p {
+      color: var(--muted);
+      font-size: 14px;
+      margin: 0 0 20px;
+    }
+    .btn-launch {
+      display: inline-block;
+      padding: 14px 32px;
+      background: var(--primary);
+      border: 1px solid var(--primary-border);
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--primary-text);
+      text-decoration: none;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .btn-launch:hover {
+      background: var(--primary-hover);
+    }
+    .btn-outline {
+      display: inline-block;
+      padding: 8px 16px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn-outline:hover {
+      background: var(--panel-2);
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <a th:href="@{/}" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:#fff;">
+        <span style="font-size:20px;">⚡</span>
+        <span style="font-weight:800;font-size:18px;">TechNova Tag Studio</span>
+      </a>
+      <span style="color:#94a3b8;font-size:13px;font-weight:500;">User Dashboard</span>
+    </div>
+    <div style="display:flex;gap:12px;align-items:center;">
+      <a th:href="@{/}" style="color:#fff;text-decoration:none;font-size:13px;font-weight:600;">Open Console</a>
+      <!-- Admin link shown only if user is an administrator -->
+      <a sec:authorize="hasAuthority('ROLE_ADMIN')" th:href="@{/admin/dashboard}" style="color:var(--primary);text-decoration:none;font-size:13px;font-weight:700;">Admin Panel 🛡️</a>
+      <form th:action="@{/logout}" method="post" style="display:inline;margin:0;">
+        <button type="submit" class="btn-outline" style="color:#fff;border-color:#3a4553;">Sign Out</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="dashboard-container">
+    <div class="welcome-card">
+      <div>
+        <h1>Welcome, <span th:text="${user.fullName}">Developer</span>! 👋</h1>
+        <p>TechNova Tag Studio SaaS Workspace • Standard User Account</p>
+      </div>
+      <div>
+        <span class="status-badge status-active" th:text="${user.accountStatus}">ACTIVE</span>
+      </div>
+    </div>
+
+    <div class="profile-grid">
+      <div class="profile-card">
+        <div class="card-label">Registered Email</div>
+        <div class="card-value" th:text="${user.email}">user@example.com</div>
+      </div>
+      <div class="profile-card">
+        <div class="card-label">Email Verification</div>
+        <div class="card-value">
+          <span th:if="${user.emailVerified}" style="color:var(--green);">✓ Verified</span>
+          <span th:unless="${user.emailVerified}" style="color:var(--accent-orange);">Pending Verification</span>
+        </div>
+      </div>
+      <div class="profile-card">
+        <div class="card-label">Assigned Role</div>
+        <div class="card-value" th:text="${user.role}">ROLE_USER</div>
+      </div>
+      <div class="profile-card">
+        <div class="card-label">Member Since</div>
+        <div class="card-value" th:text="${#temporals.format(user.createdAt, 'MMM dd, yyyy')}">Nov 14, 2026</div>
+      </div>
+    </div>
+
+    <div class="studio-action-card">
+      <h2>Ready to Optimize Your YouTube Metadata?</h2>
+      <p>Generate high-intent category tags, curated 9-part descriptions, Shorts metadata, and interact with Studio AI.</p>
+      <a th:href="@{/}" class="btn-launch">Launch TechNova Tag Studio 🚀</a>
+    </div>
+  </div>
+</body>
+</html>
