@@ -36,7 +36,7 @@ When the application boots up, the idempotent `DataInitializer` checks if an adm
 
 | Field | Value |
 |-------|-------|
-| **Registration URL** | `http://localhost:8080/register` |
+| **Registration URL** | `http://localhost:8081/register` |
 | **Role** | `ROLE_USER` (Public registration cannot assign admin privileges) |
 | **Initial Status** | `PENDING_VERIFICATION` |
 | **Verification** | A verification link is sent to the registered email address (also logged to server output in local development). Once clicked, status becomes `ACTIVE`. |
